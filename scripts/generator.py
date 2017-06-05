@@ -15,8 +15,13 @@ rev_inaud='rev_inaud_wav/'
 phndir='/home/sriram/speech/OverLap/TIMIT/audio/vad_train/'
 #### ------------- ####
 
-wavesavdir='' #Save the generated wave file in this dir
-over_addr='' #labels in the directory
+wavesavdir='/home/siddharthm/scd/wav/train/' #Save the generated wave file in this dir
+over_addr='/home/siddharthm/scd/vad/train/' #labels in the directory
+
+### SOME VARIABLE DEFINITIONS ###
+ratio_sc=0.1
+ratio_sil=0.1
+###
 
 # We are constructing ground truth from Phone files.
 # There are many ways in which we can generate speaker change files. Right now, we are generating by concatenating the two files.
@@ -68,10 +73,12 @@ def gen_func(file1,file2,i):
         # print "A2.shape: ",a2.shape
         # print "B2.shape: ",b2.shape
         #Chosing the time for overlap, 
-        overlap_time=float(np.random.choice(np.arange(5,20),1))/10  # Pick a random overlap between 500ms and 2s
-        print "Random time chosen for overlap: ",overlap_time
-        overlap_sample=min(int(overlap_time*16000),min(a2.shape[1],b2.shape[1])) #The number of samples that are going to be overlapped
-        overlap_frame=int(overlap_sample/160) # Number of frames of overlap (not taken silence into account)...
+
+        #We don't overlap to happen, right now for speaker change detection
+        # overlap_time=float(np.random.choice(np.arange(5,20),1))/10  # Pick a random overlap between 500ms and 2s
+        # print "Random time chosen for overlap: ",overlap_time
+        # overlap_sample=min(int(overlap_time*16000),min(a2.shape[1],b2.shape[1])) #The number of samples that are going to be overlapped
+        # overlap_frame=int(overlap_sample/160) # Number of frames of overlap (not taken silence into account)...
         overlap_part=a2[:,-overlap_sample:]+b2[:,0:overlap_sample]
         part1=a2[:,:-overlap_sample]
         part3=b2[:,overlap_sample:]
@@ -96,8 +103,12 @@ def gen_func(file1,file2,i):
         out=out.astype(np.int16)
         out=np.reshape(out,(out.shape[1],1)) #Reshaping it to form the vector which is required to be written in wav file
         # print "The shape of out vector: ",out.shape
-        scipy.io.wavfile.write(wavesavdir+file1+'-'+file2+'-'+'.wav',a1,out)
-        scipy.io.savemat(over_addr+file1+'-'+file2+'-'+'.mat',{'labels':labelFrames})
 
+        ### SAVING THE STUFF SECTION ###
+        scipy.io.wavfile.write(wavesavdir+file1+'-'+file2+'.wav',a1,out)
+        scipy.io.savemat(over_addr+file1+'-'+file2+'.mat',{'labels':labelFrames})
+        ### --------- ###
 
+### TRY CALLS[Actual use with wrapper] ###
 # gen_func('MPGR0_I1410','MTPF0_I1865')
+### ------- ###
