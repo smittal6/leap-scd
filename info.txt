@@ -1,0 +1,26 @@
+The aim of this file is to tell you what is going on in here.
+Directory houses stuff required to deal with Speaker Change Detection Problem
+
+Description of which stuff is where:
+
+The directory, wav contains:
+The audio files for train,val and test purposes.
+The driectory, vad contains:
+The ground truth files for the TIMIT data set.
+
+We also have to account for the number of various ways in which we can make speaker changed files.
+It can be S1-S2, or S1-S2 overlap, or S1-S2-S1, or many other such ways.
+
+Discuss with Sir, as to which all to take, and correspondingly either alter the directory structure, or make directories in the existing structure.
+
+UPDATE[5/6/17]: Discussion with Sir
+We won't be taking silence, and also we won't be taking overlapped speech, atleast right now.
+Also, we are fixing some parameters which decide which label to give to a frame.
+If the ratio of speaker 1 to speaker 2 in a frame is greater then, 0.1 then we label the frame as speaker change frame.
+If the ratio is less than that, we label the frame as non speaker change frame
+Also, if a frame has ratio greater than 0.1 of silence frames, we label it something else.
+
+Labels:
+0: Single speaker frame
+1: Speaker change frame[With 10% condition]
+2: Silence frame[With 10% condition]
