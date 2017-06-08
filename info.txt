@@ -23,4 +23,8 @@ Also, if a frame has ratio greater than 0.1 of silence frames, we label it somet
 Labels:
 0: Single speaker frame
 1: Speaker change frame[With 10% condition]
-2: Silence frame[With 10% condition]
+2: Silence frame[With 15% condition]
+
+The decision window was taken to be 400 ms, because it helped in getting required number of frames.
+The number of frames available for classification is around 4%.
+We still need to remove the class, with Label 2 as this data is not clean
