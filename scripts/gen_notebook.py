@@ -21,8 +21,8 @@ phndir='/home/sriram/speech/OverLap/TIMIT/audio/vad_train/'
 choices=[clean,rev,rev_noise,rev_inaud]
 #### ------------- ####
 
-wavesavdir='/home/siddharthm/scd/wav/val/' #Save the generated wave file in this dir
-over_addr='/home/siddharthm/scd/vad/val/' #labels in the directory
+wavesavdir='/home/siddharthm/scd/wav/train/' #Save the generated wave file in this dir
+over_addr='/home/siddharthm/scd/vad/train/' #labels in the directory
 
 ### SOME VARIABLE DEFINITIONS ###
 ratio_sc=0.1
@@ -42,7 +42,7 @@ silence_samples=0.10*decision_samples
 
 def gen_func(file1,file2,input_index):
         print('Begin')
-        print(file1,file2)
+        print(file1,file2,input_index)
         #Fetching the base directory of the working files
         wav_addr1=base+choices[np.random.randint(3)]
         wav_addr2=base+choices[np.random.randint(4)]
@@ -87,13 +87,6 @@ def gen_func(file1,file2,input_index):
         a2=a2.astype(float)
         b2=b2.astype(float)
 
-        # print "A2.shape: ",a2.shape
-        # print "B2.shape: ",b2.shape
-        #Chosing the time for overlap, 
-
-        #We don't overlap to happen, right now for speaker change detection
-        # part3=b2[:,overlap_sample:]
-
         #### FRAME LEVEL MANIPULATIONS FOR CREATING OVERLAP LABELS ####
         nFrames1=int(a2.shape[1]/160) #Number of frames that are possible from File one
         nFrames2=int(b2.shape[1]/160) #Number of frames from File 2
@@ -117,18 +110,24 @@ def gen_func(file1,file2,input_index):
         lastindex=np.where(labelFrames1==1)[0][-1]
         firstindex=np.where(labelFrames2==2)[0][0]
         silence_part=np.zeros((int(silence_samples/160),),dtype=np.int)
-        # print lastindex, " ", firstindex
-        labelpart1=np.hstack((labelFrames1[0:lastindex],silence_part))
-        labelpart2=np.hstack((silence_part,labelFrames2[firstindex:]))
+        silence_actual_wav=np.zeros((int(silence_samples),))
+        # print "Number of frames in File 1",nFrames1
+        # print "Last non zero File1: ",lastindex,",First File 2: ",firstindex,",Length of complete vector: ",labelFrames2.shape
+        labelpart1=np.hstack((labelFrames1[0:lastindex+1],silence_part))
+        labelpart2=np.hstack((labelFrames2[firstindex:])) #silence part was not extraneous, was coming twice
         labelFrames = np.hstack((labelpart1,labelpart2))
+        # print "Length of the labelFRames vector: ",labelFrames.shape
         start=0
         iterator=0
         skip_entries=int(decision_samples/160)
         # print "Skip entries", skip_entries #By skip entries we mean the entries to be skipped in the label vector
         end=start+skip_entries
         ### GENERATING THE ACTUAL WAVE FILE ###
-        out=np.hstack((a2[0,:160*lastindex],b2[0,160*firstindex:])) #Actually creating the numpy array which has the overlap and single speaker speech segments
-        # print out.shape
+        # print "Actual samples from silence region: ",silence_actual_wav.shape[0]
+        # print "Samples from First file: ",160*(lastindex+1)
+        samplestart=160*labelFrames.shape[0]-(silence_actual_wav.shape[0]+160*(lastindex+1))
+        out=np.hstack((a2[0,:160*(lastindex+1)],silence_actual_wav,b2[0,-samplestart:-1])) #Actually creating the numpy array which has the overlap and single speaker speech segments
+        # print "Out wav file: ", out.shape
         flabels=[]
         count=0
         # 2 for the silence class, 1 for speaker change frame, 0 for no speaker change frame
