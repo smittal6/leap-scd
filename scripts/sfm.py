@@ -8,9 +8,9 @@ import math
 import sklearn.preprocessing as skp
 from scipy import signal as sig
 print "Please check the arguments were as follows: Raw list,Wavefile dir,Savedir"
-rawlist='/home/siddharthm/scd/lists/rawvalfiles.list'
-wavfiledir='/home/siddharthm/scd/wav/val/'
-savedir='/home/siddharthm/scd/feats/sfm/val/'
+rawlist='/home/siddharthm/scd/lists/rawtestfiles.list'
+wavfiledir='/home/siddharthm/scd/wav/test/'
+savedir='/home/siddharthm/scd/feats/sfm/test/'
 f=open(rawlist)
 f=f.read()
 f=f.strip()
