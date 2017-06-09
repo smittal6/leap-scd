@@ -28,3 +28,9 @@ Labels:
 The decision window was taken to be 400 ms, because it helped in getting required number of frames.
 The number of frames available for classification is around 4%.
 We still need to remove the class, with Label 2 as this data is not clean
+
+Update[Done with feature generation,9/6/17]:
+
+On some features to try out:
+Gini index[Which kind of tries to measure the inharmonicity of the structure ]
+
