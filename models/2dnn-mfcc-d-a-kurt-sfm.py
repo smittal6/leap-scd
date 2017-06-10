@@ -27,30 +27,41 @@ epoch=10 #Number of iterations to be run on the model while training
 trainfile='/home/siddharthm/scd/combined/train-mfcc-kurt-sfm-labels.htk'
 testfile='/home/siddharthm/scd/combined/test-mfcc-kurt-sfm-labels.htk'
 valfile='/home/siddharthm/scd/combined/val-mfcc-kurt-sfm-labels.htk'
-perc=0.5 #To control how much single speaker data we are letting in
+# perc=0.5 #To control how much single speaker data we are letting in
+
+def filter_data(x):
+        ### Filter the data. That is only keep 0 or 1 classes.
+        return x[(x[:,-1]==0)or(x[:,-1]==1)]
+
 def load_data_train(trainfile):
         print "Getting the overlap training data"
         a=htk.open(trainfile)
         train_data=a.getall()
         print "Done with Loading the training data: ",train_data.shape
-        x_train=train_data[:,:-2] #Set to different column based on differrent model
+        data=filter_data(train_data)
+        x_train=train_data[:,:-2] #Set to different column based on different model
         y_train=train_data[:,-1]
         del data
         return x_train,y_train
+
 def load_data_test(testfile):
         a=htk.open(testfile)
         data=a.getall()
         print "Done loading the testing data: ",data.shape
+        data=filter_data(data)
         x_test=data[:,:-2]
         y_test=data[:,-1]
         del data
         return x_test,y_test
+
 def load_data_val(valfile):
         a=htk.open(valfile)
         data=a.getall()
         print "Done loading the validation data: ",data.shape
+        data=filter_data(data)
         x_val=data[:,:-2]
         y_val=data[:,-1]
+        del data
         return x_val,y_val
 
 ### THE MODEL and ALL ###
@@ -96,8 +107,12 @@ x_test,y_test=load_data_test(testfile)
 print "Loading testing data complete"
 x_val,y_val=load_data_val(valfile)
 print "Loading validation data complete"
-# print "Shape test: ",x_train.shape," ",y_train.shape
-#x_test,y_test=load_data_test(testfile)
+
+### SHAPE TESTS ###
+print "Train Shape: ",x_train.shape," ",y_train.shape
+print "Test Shape: ",x_test.shape," ",y_test.shape
+print "Val Shape: ",x_val.shape," ",y_val.shape
+###
 
 #Some parameters for training the model
 epoch=10 #Number of iterations to be run on the model while training
