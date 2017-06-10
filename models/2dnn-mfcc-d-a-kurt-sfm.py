@@ -31,7 +31,7 @@ valfile='/home/siddharthm/scd/combined/val-mfcc-kurt-sfm-labels.htk'
 
 def filter_data(x):
         ### Filter the data. That is only keep 0 or 1 classes.
-        return x[(x[:,-1]==0)or(x[:,-1]==1)]
+        return x[(x[:,-1]==0)|(x[:,-1]==1)]
 
 def load_data_train(trainfile):
         print "Getting the overlap training data"
@@ -39,7 +39,7 @@ def load_data_train(trainfile):
         train_data=a.getall()
         print "Done with Loading the training data: ",train_data.shape
         data=filter_data(train_data)
-        x_train=train_data[:,:-2] #Set to different column based on different model
+        x_train=train_data[:,:-1] #Set to different column based on different model
         y_train=train_data[:,-1]
         del data
         return x_train,y_train
@@ -49,7 +49,7 @@ def load_data_test(testfile):
         data=a.getall()
         print "Done loading the testing data: ",data.shape
         data=filter_data(data)
-        x_test=data[:,:-2]
+        x_test=data[:,:-1]
         y_test=data[:,-1]
         del data
         return x_test,y_test
@@ -59,7 +59,7 @@ def load_data_val(valfile):
         data=a.getall()
         print "Done loading the validation data: ",data.shape
         data=filter_data(data)
-        x_val=data[:,:-2]
+        x_val=data[:,:-1]
         y_val=data[:,-1]
         del data
         return x_val,y_val
@@ -69,18 +69,19 @@ def seq(x_train,y_train,x_val,y_val,x_test,y_test):
         #Defining the structure of the neural network
         #Creating a Network, with 2 hidden layers.
         model=Sequential()
-        model.add(Dense(256,activation='relu',input_dim=(1))) #Hidden layer1
+        model.add(Dense(256,activation='relu',input_dim=(41))) #Hidden layer1
         model.add(Dense(256,activation='relu')) #Hidden layer 2
+        model.add(Dropout(0.5))
         model.add(Dense(1,activation='sigmoid')) #Output Layer
         #Compilation region: Define optimizer, cost function, and the metric?
         model.compile(optimizer='adam',loss='binary_crossentropy',metrics=['accuracy'])
         #Fitting region:Get to fit the model, with training data
-        checkpointer=ModelCheckpoint(filepath=direc+common-save+'.json',monitor='val_acc',save_best_only=True,save_weights_only=True)
+        checkpointer=ModelCheckpoint(filepath=direc+common_save+'.json',monitor='val_acc',save_best_only=True,save_weights_only=True)
 
         #Doing the training[fitting]
         model.fit(x_train,y_train,nb_epoch=10,batch_size=batch,validation_data=(x_val,y_val),callbacks=[checkpointer])
-        model.save_weights(direc+common-save+'-weights'+'.json') #Saving the weights from the model
-        model.save(direc+common-save+'-model'+'.json')#Saving the model as is in its state
+        model.save_weights(direc+common_save+'-weights'+'.json') #Saving the weights from the model
+        model.save(direc+common_save+'-model'+'.json')#Saving the model as is in its state
 
         ### SAVING THE VALIDATION DATA ###
         scores=model.predict(x_val,batch_size=batch)
@@ -115,10 +116,10 @@ print "Val Shape: ",x_val.shape," ",y_val.shape
 ###
 
 #Some parameters for training the model
-epoch=10 #Number of iterations to be run on the model while training
+epoch=20 #Number of iterations to be run on the model while training
 batch=1024 #Batch size to be used while training
 direc="/home/siddharthm/scd/scores/"
-common-save='2dnn-mfcc-d-a-kurt-sfm'
-name_val=common-save+'-val'
-name_test=common-save+'-test'
+common_save='2dnn-mfcc-d-a-kurt-sfm'
+name_val=common_save+'-val'
+name_test=common_save+'-test'
 seq(x_train,y_train,x_val,y_val,x_test,y_test) #Calling the seq model, with 2 hidden layers
