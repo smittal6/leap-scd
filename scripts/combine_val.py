@@ -12,10 +12,8 @@ def file_opener(file_read):
         file_reader=re.split('\n',file_reader)
         return file_reader
 def changedir():
-	if os.path.isdir('/home/siddharthm/scd/combined'):
-                pass
-	else:
-                os.chdir('/home/siddharthm/scd/combined')
+        os.chdir('/home/siddharthm/scd/combined')
+        print "Current working directory: ",os.getcwd()
 
 def data_creator(num,addr,file_reader,filename):
         corrupt_files=0
@@ -37,34 +35,28 @@ def data_creator(num,addr,file_reader,filename):
                         kurt_vector=np.transpose(kurt_matrix)
                         sfm_vector=np.transpose(sfm_matrix)
                         label_vector=np.transpose(labels_this_file)
-                        print "Got all the vectors"
-                        print read_data.shape,kurt_vector.shape,sfm_vector.shape,label_vector.shape
                         final_vector=np.hstack((read_data,kurt_vector,sfm_vector,label_vector))
-                        print "Horizontally stacking done"
                         matrix=np.vstack((matrix,final_vector))
-                        print "Vertical stacking done"
                         del read_data
                 except:
-                                corrupt_files+=1
-                                continue
-                                ind=ind+read_data.shape[0]
-        print "The shape of the matrix to be written: ",matrix.shape
-        changedir()
+                        corrupt_files+=1
+                        continue
+                        ind=ind+read_data.shape[0]
         writer.writeall(matrix)
         print('corrput_files',corrupt_files)
-        #   labels=np.ones((ind,1))
-        #   labels=labels*index
-        #	print(labels.shape)
-        #	wri=htk.open(filename+'labels.htk',mode='w',veclen=1)
-        #	wri.writeall(labels)
+        #labels=np.ones((ind,1))
+        #labels=labels*index
+        #print(labels.shape)
+        #wri=htk.open(filename+'labels.htk',mode='w',veclen=1)
+        #wri.writeall(labels)
 
-addr='/home/siddharthm/scd/feats/mfcc/train/'#address of the HTK files stored somewhere
-kurt_addr='/home/siddharthm/scd/feats/kurt/train/'
-sfm_addr='/home/siddharthm/scd/feats/sfm/train/'
-label_addr='/home/siddharthm/scd/vad/train/'
+addr='/home/siddharthm/scd/feats/mfcc/val/'#address of the HTK files stored somewhere
+kurt_addr='/home/siddharthm/scd/feats/kurt/val/'
+sfm_addr='/home/siddharthm/scd/feats/sfm/val/'
+label_addr='/home/siddharthm/scd/vad/val/'
 num=39+1+1+1 #The length of the feature vector, to be read and stored in the htk format[Right now, 39 MFCC_D_A+1 KURT+ 1 SFM+1 Label]
-file_read='/home/siddharthm/scd/lists/rawtrainfiles.list' #The raw filenames, in the form of list
-filename='mfcc-kurt-sfm-labels' #The name of the file where stuff is going to be stored
-#file_reader=file_opener(file_read) #Calling the function to read the list of files
-file_reader=['FAJW0_I1263-FCYL0_X349-9346','FAJW0_I1263-FGCS0_X226-13892']
+file_read='/home/siddharthm/scd/lists/valfiles/'+str(sys.argv[1]) #The raw filenames, in the form of list
+filename='val-mfcc-kurt-sfm-labels-'+str(sys.argv[2]) #The name of the file where stuff is going to be stored
+file_reader=file_opener(file_read) #Calling the function to read the list of files
+# file_reader=['FAJW0_I1263-FCYL0_X349-9346','FAJW0_I1263-FGCS0_X226-13892']
 data_creator(num,addr,file_reader,filename) #Finally call the data creator

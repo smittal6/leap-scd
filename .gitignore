@@ -1,6 +1,9 @@
 *.pyc
 *.swp
 *.ipynb
+*.list
+*.out
 feats/
 wav/
 vad/
+combined/

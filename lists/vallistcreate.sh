@@ -1,3 +1,4 @@
+#This is the list creator for valing files
 direc="/home/siddharthm/scd/wav/val"
 #First create the raw.wav files
 ls $direc $search_path > rawvalwav.list
