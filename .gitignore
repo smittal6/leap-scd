@@ -7,3 +7,7 @@ feats/
 wav/
 vad/
 combined/
+scores/
+lists/trainfiles/
+lists/testfiles/
+lists/valfiles/
