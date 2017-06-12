@@ -31,11 +31,12 @@ valfile='/home/siddharthm/scd/combined/val-mfcc-kurt-sfm-labels.htk'
 
 def filter_data(x):
         ### Filter the data. That is only keep 0 or 1 classes.
-        indexes0=np.where(x[:,-1]==0)[0]
-        indexes1=np.where(x[:,-1]==1)[0]
-        temp=np.hstack((indexes0,indexes1))
-        tempsort=np.sort(temp)
-        return x[temp]
+        # indexes0=np.where(x[:,-1]==0)[0]
+        # indexes1=np.where(x[:,-1]==1)[0]
+        # temp=np.hstack((indexes0,indexes1))
+        # tempsort=np.sort(temp)
+        # print tempsort
+        return x[ (x[:,-1]==0)|(x[:,-1]==1)]
 
 def load_data_train(trainfile):
         print "Getting the overlap training data"
@@ -43,8 +44,8 @@ def load_data_train(trainfile):
         train_data=a.getall()
         print "Done with Loading the training data: ",train_data.shape
         data=filter_data(train_data)
-        x_train=train_data[:,:-1] #Set to different column based on different model
-        Y_train=train_data[:,-1]
+        x_train=data[:,:-1] #Set to different column based on different model
+        Y_train=data[:,-1]
         print Y_train.shape
         print np.where(Y_train==2)
         Y_train=Y_train.reshape(Y_train.shape[0],1)
