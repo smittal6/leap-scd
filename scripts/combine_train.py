@@ -36,13 +36,14 @@ def data_creator(num,addr,file_reader,filename):
                         sfm_vector=np.transpose(sfm_matrix)
                         label_vector=np.transpose(labels_this_file)
                         final_vector=np.hstack((read_data,kurt_vector,sfm_vector,label_vector))
-                        matrix=np.vstack((matrix,final_vector))
+                        # matrix=np.vstack((matrix,final_vector))
                         del read_data
                 except:
                         corrupt_files+=1
                         continue
                         ind=ind+read_data.shape[0]
-        writer.writeall(matrix)
+                #HTK supports concatenation, so we don't have to deal with numpy matrix again and again
+                writer.writeall(final_vector)
         print('corrput_files',corrupt_files)
         #labels=np.ones((ind,1))
         #labels=labels*index
