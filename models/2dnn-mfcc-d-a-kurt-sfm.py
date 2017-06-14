@@ -1,3 +1,9 @@
+
+# coding: utf-8
+
+# In[7]:
+
+
 import numpy as np
 import htkmfc as htk
 import scipy.io as sio
@@ -39,7 +45,7 @@ def filter_data(x):
         return x[ (x[:,-1]==0)|(x[:,-1]==1)]
 
 def load_data_train(trainfile):
-        print "Getting the overlap training data"
+        print "Getting the training data"
         a=htk.open(trainfile)
         train_data=a.getall()
         print "Done with Loading the training data: ",train_data.shape
@@ -62,10 +68,10 @@ def load_data_test(testfile):
         x_test=data[:,:-1]
         Y_test=data[:,-1]
         print np.where(Y_test==2)
-        Y_test=np.reshape(Y_test,(Y_test.shape[0],1))
-        y_test=np_utils.to_categorical(Y_test,2)
+        # Y_test=np.reshape(Y_test,(Y_test.shape[0],1))
+        # y_test=np_utils.to_categorical(Y_test,2)
         del data
-        return x_test,y_test
+        return x_test,Y_test
 
 def load_data_val(valfile):
         a=htk.open(valfile)
@@ -79,6 +85,23 @@ def load_data_val(valfile):
         del data
         return x_val,y_val
 
+def metrics(y_test,predictions,classes):
+        correct_change=0
+        #print predictions[0:15,1]
+        #classes=np_utils.probas_to_classes(predictions)
+        print classes.shape
+        print np.where(classes==1)
+        for i in range(len(x_test)):
+            if y_test[i]==1 and classes[i]==1:
+                correct_change+=1
+        print "Correct changes detected: ",correct_change
+        print "Total speaker change frames: ",len(y_test[y_test==1])
+        ### ------------- ###
+
+
+# In[2]:
+
+
 ### THE MODEL and ALL ###
 def seq(x_train,y_train,x_val,y_val,x_test,y_test):
         #Defining the structure of the neural network
@@ -91,7 +114,7 @@ def seq(x_train,y_train,x_val,y_val,x_test,y_test):
         #Compilation region: Define optimizer, cost function, and the metric?
         model.compile(optimizer='adam',loss='binary_crossentropy',metrics=['accuracy'])
         #Fitting region:Get to fit the model, with training data
-        checkpointer=ModelCheckpoint(filepath=direc+common_save+'.json',monitor='val_acc',save_best_only=True,save_weights_only=True)
+        checkpointer=ModelCheckpointkeras predict classeskeras predict classes(filepath=direc+common_save+'.json',monitor='val_acc',save_best_only=True,save_weights_only=True)
 
         #Doing the training[fitting]
         model.fit(x_train,y_train,epochs=10,batch_size=batch,validation_data=(x_val,y_val),callbacks=[checkpointer])
@@ -107,16 +130,20 @@ def seq(x_train,y_train,x_val,y_val,x_test,y_test):
         scores_test=model.predict(x_test,batch_size=batch)
         sio.savemat(direc+name_test+'.mat',{'scores':scores_test,'ytest':y_test})
         ### ------------- ###
-        print model.evaluate(x_test,y_test,batch_size=batch)
+        # print model.evaluate(x_test,y_test,batch_size=batch)
         ### For finding the details of classification ###
         correct_change=0
         predictions=model.predict(x_test,batch_size=batch)
-        for i in range(len(x_test)):
-                if y_test[i]==1 and predictions[i]==1:
-                        correct_change+=1
-        print "Correct changes detected: ",correct_change
-        print "Total speaker change frames: ",len(y_test[y_test==1])
-        ### ------------- ###
+        classes=model.predict_classes(x_test,batch_size=batch)
+        print "Shape of predictions: ", predictions.shape
+        print "Shape of y_test: ",y_test.shape
+        return y_test,predictions,classes
+        
+
+
+# In[3]:
+
+
 #Non-function section
 x_train,y_train=load_data_train(trainfile)
 print "Loading training data complete"
@@ -138,4 +165,11 @@ direc="/home/siddharthm/scd/scores/"
 common_save='2dnn-mfcc-d-a-kurt-sfm'
 name_val=common_save+'-val'
 name_test=common_save+'-test'
-seq(x_train,y_train,x_val,y_val,x_test,y_test) #Calling the seq model, with 2 hidden layers
+y_test,predictions,classes=seq(x_train,y_train,x_val,y_val,x_test,y_test) #Calling the seq model, with 2 hidden layers
+
+
+# In[8]:
+
+
+metrics(y_test,predictions,classes)
+
