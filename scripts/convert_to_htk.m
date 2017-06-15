@@ -3,7 +3,7 @@ clear all; clc;
 %parpool(poolsize);
 %Par parameters are for parallel processing of the files
 % ----- update the path to respective directories
-label_train_addr = '/home/neerajs/work/NEW_REGIME/SID/OVERLAP/val/';
+label_addr = '/home/siddharthm/scd/vad/train/';
 mfcc_feats_addr = '/home/neerajs/work/NEW_REGIME/SID/FEATS/mfcc_after/train/';
 kurt_feats_addr = '/home/neerajs/work/NEW_REGIME/SID/FEATS/kurt_after/val/';
 sfm_feats_addr = '/home/neerajs/work/NEW_REGIME/SID/FEATS/sfm_after/val/';
@@ -22,8 +22,8 @@ type = 'EXTRA';
 for i = 1:len
 [i len]
 % read the label file        
-%vad = load([label_train_addr f{1}{i}]);
-
+temp = load([label_addr f{1}{i}]);
+vad=temp.labels % The labels are now stored in the 
 % check the feature type
 switch(type)
         case 'KURT'
@@ -56,21 +56,28 @@ end
 % how the data is created and stored is upto me
 % For each file we have many entries in a row, we want to take a certain number of entries <--- Fuck this
 % We have input of type, for a file: NFilts X Samples in the File. Fucking take 40 columns. Flatten it in a row major order, and store along with the label.
+% Data is now of the form 64 X Number of frames
 
 % Displaying the size of Data input and the the file
 size(data)
 f{1}{i}
-pause
+%pause
 % read each feature file and make context feature file
-%nframes = min(size(data,2),length(vad.labels));
+nframes = min(size(data,2),length(vad));
 %data_write = zeros(nframes,(2*context_size+1)*size(data,1));
-%label_write = zeros(nframes,1);
-%ssegs = 1;
 
-%for index = 1:nframes
+temp_matrix=zeros(64,40);
+final_matrix=zeros(40*size(data,1),65) %65 columns as 64 filts and 1 label file
+start=1;
+fin=start+39;
+%We want to take 40 such frames, and store this matrix in a row major order
+while fin < nframes
         %display([index nframes])
-%end
+        temp_matrix=data(:,start:fin)
+        temp_vector=temp_matrix.reshape()
+        start=start+1
+end
 % save them
-%writehtk([context_addr op_path '/val/' f{1}{i} '.htk'],data_write,0.11,9); 
+writehtk([context_addr op_path '/val/' f{1}{i} '.htk'],data_write,0.11,9); 
 %writehtk([context_addr 'labels/val/' f{1}{i} '.htk'],label_write,0.11,9);
 end
