@@ -1,6 +1,6 @@
 clear all; clc;
-%poolsize = 8;
-%parpool(poolsize);
+poolsize = 8;
+parpool(poolsize);
 %Par parameters are for parallel processing of the files
 % ----- update the path to respective directories
 label_addr = '/home/siddharthm/scd/vad/train/';
@@ -18,12 +18,12 @@ len=cellfun('length',f)
 type = 'EXTRA';
 %context_size = 5;
 
-%parfor i = 1:len
-for i = 1:len
+parfor i = 1:len
+%for i = 1:3
 [i len]
 % read the label file        
 temp = load([label_addr f{1}{i}]);
-vad=temp.labels % The labels are now stored in the 
+vad=temp.labels; % The labels are now stored in the 
 % check the feature type
 switch(type)
         case 'KURT'
@@ -49,7 +49,7 @@ switch(type)
         case 'EXTRA'
                 [data_extra,a,b,c,d]=readhtk([EXTRA f{1}{i} '.htk']);
                 data=data_extra';
-                op_path='context'
+                op_path='train';
 end
 
 % The idea is to generate the final datafile, for each file which kind of will include the context
@@ -63,21 +63,26 @@ size(data)
 f{1}{i}
 %pause
 % read each feature file and make context feature file
-nframes = min(size(data,2),length(vad));
+nframes = size(data,2);
 %data_write = zeros(nframes,(2*context_size+1)*size(data,1));
 
 temp_matrix=zeros(64,40);
-final_matrix=zeros(40*size(data,1),65) %65 columns as 64 filts and 1 label file
+final_matrix=zeros(size(data,2)-40+1,40*size(data,1)+1); % The dimensions of the final matrix to be saved
+% The rows are essentially the number of frames we can construct, which is given by number-shift+1
 start=1;
 fin=start+39;
 %We want to take 40 such frames, and store this matrix in a row major order
 while fin < nframes
         %display([index nframes])
-        temp_matrix=data(:,start:fin)
-        temp_vector=temp_matrix.reshape()
-        start=start+1
+        temp_matrix=data(:,start:fin);
+        temp_vector=reshape(temp_matrix.',1,[]);
+        temp_vector=[temp_vector,vad(start)];
+        final_matrix(start,:)=temp_vector;
+        start=start+1;
+        fin=start+39;
 end
+%size(final_matrix)
 % save them
-writehtk([context_addr op_path '/val/' f{1}{i} '.htk'],data_write,0.11,9); 
+writehtk([context_addr op_path '/' f{1}{i} '.htk'],final_matrix,0.11,9); 
 %writehtk([context_addr 'labels/val/' f{1}{i} '.htk'],label_write,0.11,9);
 end
