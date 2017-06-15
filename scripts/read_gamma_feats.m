@@ -1,30 +1,31 @@
 
 % obtaining mel spectrum
-%f=fopen('/home/neerajs/work/blurp_universe/TIMIT/list_of_over_files_revv3_noise_full_db.list');
-%f=textscan(f,'%s');
-%len=cellfun('length',f)
-%poolsize = 8;
-%parpool(poolsize);
 
-path = '/home/neerajs/work/NEW_REGIME/SID/WAV/val/'; %Path of wav files
-savedir = ''
+poolsize = 8;
+parpool(poolsize);
+
+path = '/home/siddharthm/scd/wav/val/'; %Path of wav files
+savedir = '/home/siddharthm/scd/feats/gamma/val/'; %The save directory
 filename = dir([path '*.wav']);
 len = length(filename);
 Fs_proc = 16e3;
 get_mel = 1;
 
-for i =1:1%len
+parfor i =1:len
+
 display([i len])
 [sig,Fs] = audioread(strcat(path,filename(i).name));
+%display(length(sig))
 
 if Fs<Fs_proc
    sig = resample(sig,Fs_proc,Fs);
 end
 Fs = Fs_proc;
-sig = [diff(sig);0]; % pre-emphasis
+%sig = [diff(sig);0]; % pre-emphasis
 if get_mel
+    % Here, change the parameters according to the needs
     wmsec = 0.025; hop = .010; nfilts = 64;
-    fmin = 50; fmax = Fs/4;
+    fmin = 20; fmax = Fs/2;
     [STFTmag,F2] = gammatonegram(sig,Fs,wmsec,hop,nfilts,fmin,fmax,0);
     STFTmag=STFTmag';
     disp(size(STFTmag))

@@ -37,11 +37,6 @@ valfile='/home/siddharthm/scd/combined/val-mfcc-kurt-sfm-labels.htk'
 
 def filter_data(x):
         ### Filter the data. That is only keep 0 or 1 classes.
-        # indexes0=np.where(x[:,-1]==0)[0]
-        # indexes1=np.where(x[:,-1]==1)[0]
-        # temp=np.hstack((indexes0,indexes1))
-        # tempsort=np.sort(temp)
-        # print tempsort
         return x[ (x[:,-1]==0)|(x[:,-1]==1)]
 
 def load_data_train(trainfile):
