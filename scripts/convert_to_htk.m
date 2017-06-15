@@ -1,18 +1,18 @@
 clear all; clc;
-poolsize = 8;
+poolsize = 16;
 parpool(poolsize);
 %Par parameters are for parallel processing of the files
 % ----- update the path to respective directories
-label_addr = '/home/siddharthm/scd/vad/train/';
+label_addr = '/home/siddharthm/scd/vad/test/';
 mfcc_feats_addr = '/home/neerajs/work/NEW_REGIME/SID/FEATS/mfcc_after/train/';
 kurt_feats_addr = '/home/neerajs/work/NEW_REGIME/SID/FEATS/kurt_after/val/';
 sfm_feats_addr = '/home/neerajs/work/NEW_REGIME/SID/FEATS/sfm_after/val/';
 mel_feats_addr = '/home/neerajs/work/NEW_REGIME/SID/FEATS/mel_after/train_4Khz/';
 linear_feats_addr='/home/neerajs/work/NEW_REGIME/SID/FEATS/linear_after/train/';
-EXTRA='/home/siddharthm/scd/feats/gamma/train/';
+EXTRA='/home/siddharthm/scd/feats/gamma/test/';
 context_addr = '/home/siddharthm/scd/context/';
 % ----- list of files
-f=fopen('/home/siddharthm/scd/lists/rawtrainfiles.list');
+f=fopen('/home/siddharthm/scd/lists/rawtestfiles.list');
 f=textscan(f,'%s');
 len=cellfun('length',f)
 type = 'EXTRA';
@@ -49,7 +49,7 @@ switch(type)
         case 'EXTRA'
                 [data_extra,a,b,c,d]=readhtk([EXTRA f{1}{i} '.htk']);
                 data=data_extra';
-                op_path='train';
+                op_path='test';
 end
 
 % The idea is to generate the final datafile, for each file which kind of will include the context
@@ -59,7 +59,7 @@ end
 % Data is now of the form 64 X Number of frames
 
 % Displaying the size of Data input and the the file
-size(data)
+%size(data)
 f{1}{i}
 %pause
 % read each feature file and make context feature file
