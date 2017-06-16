@@ -33,6 +33,9 @@ epoch=10 #Number of iterations to be run on the model while training
 trainfile='/home/siddharthm/scd/lists/rawtrainfiles.list'
 testfile='/home/siddharthm/scd/lists/rawtestfiles.list'
 valfile='/home/siddharthm/scd/lists/rawvalfiles.list'
+filename_train='clean-gamma-labels-train'
+filename_test='clean-gamma-labels-test'
+filename_val='clean-gamma-labels-val'
 
 def changedir():
         os.chdir('/home/siddharthm/scd/combined')
@@ -41,6 +44,7 @@ def changedir():
 def filter_data(x):
         ### Filter the data. That is only keep 0 or 1 classes.
         return x[ (x[:,-1]==0)|(x[:,-1]==1)]
+
 def load_data_train(trainfile):
         a=htk.open(trainfile)
         train_data=a.getall()
@@ -66,14 +70,9 @@ def load_data_val(valfile):
         data=a.getall()
         print "Done loading the validation data: ",data.shape
         data=filter_data(data)
+        print "Filtered test data shape: ",data.shape
+        changedir()
+        writer=htk.open(filename_val+'.htk',mode='w',veclen=data.shape[1])
         del data
 
-### SHAPE TESTS ###
-print "Train Shape: ",x_train.shape," ",y_train.shape
-print "Test Shape: ",x_test.shape," ",y_test.shape
-print "Val Shape: ",x_val.shape," ",y_val.shape
-###
-
-name_val=common_save+'-val'
-name_test=common_save+'-test'
 
