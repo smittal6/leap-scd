@@ -32,7 +32,7 @@ def data_creator(num,addr,file_reader,filename):
                 ### GAMMATONE -- LABEL   <--- Structure of the final matrix
                 try:
                         read_data=data_read.getall()
-                        print "Shape of Read Data: ",read_data.shape
+                        # print "Shape of Read Data: ",read_data.shape
                         # kurt_vector=np.transpose(kurt_matrix)
                         # sfm_vector=np.transpose(sfm_matrix)
                         # label_vector=np.transpose(labels_this_file)
@@ -56,6 +56,6 @@ addr='/home/siddharthm/scd/context/'+str(sys.argv[1])#address of the HTK files s
 num=40*64+1 #The length of the feature vector, to be read and stored in the htk format[Right now,40*64 Gammatone+1 Label]
 file_read='/home/siddharthm/scd/lists/'+str(sys.argv[2]) #The raw filenames, in the form of list
 filename='gamma-labels-'+str(sys.argv[3]) #The name of the file where stuff is going to be stored
-# file_reader=file_opener(file_read) #Calling the function to read the list of files
-file_reader=['FAJW0_I1263-FCYL0_X349-9346','FAJW0_I1263-FGCS0_X226-13892']
+file_reader=file_opener(file_read) #Calling the function to read the list of files
+# file_reader=['FAJW0_I1263-FCYL0_X349-9346','FAJW0_I1263-FGCS0_X226-13892']
 data_creator(num,addr,file_reader,filename) #Finally call the data creator
