@@ -7,20 +7,6 @@
 import numpy as np
 import htkmfc as htk
 import scipy.io as sio
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler
-from keras.preprocessing import sequence
-from keras.models import Sequential
-from keras.layers import Dense, Dropout, Embedding, LSTM, Input, Bidirectional
-from keras.models import Sequential
-from keras.layers.core import Dense, Dropout, Activation, Reshape, Permute
-from keras.layers.wrappers import TimeDistributed
-from keras.optimizers import SGD, Adam, RMSprop
-from keras.utils import np_utils
-from keras.regularizers import l2
-from keras.callbacks import ModelCheckpoint
-from keras.layers.convolutional import Conv2D,
-from keras.layers.pooling import MaxPooling2D
 from multiprocessing import Process
 
 import ConfigParser
@@ -76,9 +62,9 @@ def load_data_val(valfile):
         writer=htk.open(filename_val+'.htk',mode='w',veclen=data.shape[1])
         del data
 
-p1=Process(target=load_data_train)
-p2=Process(target=load_data_test)
-p3=Process(target=load_data_val)
+p1=Process(target=load_data_train(trainfile))
+p2=Process(target=load_data_test(testfile))
+p3=Process(target=load_data_val(valfile))
 p3.start()
 p2.start()
 p1.start()
