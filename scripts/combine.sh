@@ -11,6 +11,8 @@
 #done
 
 #The combine_gamma program takes as input 3 arguments
-python combine_gamma.py train/ trainfile.list train
-python combine_gamma.py test/ testfile.list test
-python combine_gamma.py val/ valfile.list val
+python combine_gamma.py train/ rawtrainfiles.list train &
+python combine_gamma.py test/ rawtestfiles.list test &
+python combine_gamma.py val/ rawvalfiles.list val &
+wait
+echo "Done nigga"
