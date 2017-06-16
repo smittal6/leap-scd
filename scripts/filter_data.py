@@ -17,9 +17,9 @@ import os
 
 np.random.seed(1337)
 epoch=10 #Number of iterations to be run on the model while training
-trainfile='/home/siddharthm/scd/lists/rawtrainfiles.list'
-testfile='/home/siddharthm/scd/lists/rawtestfiles.list'
-valfile='/home/siddharthm/scd/lists/rawvalfiles.list'
+trainfile='/home/siddharthm/scd/combined/gamma-labels-train.htk'
+testfile='/home/siddharthm/scd/combined/gamma-labels-test.htk'
+valfile='/home/siddharthm/scd/combined/gamma-labels-val.htk'
 filename_train='clean-gamma-labels-train'
 filename_test='clean-gamma-labels-test'
 filename_val='clean-gamma-labels-val'
