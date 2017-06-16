@@ -21,6 +21,7 @@ from keras.regularizers import l2
 from keras.callbacks import ModelCheckpoint
 from keras.layers.convolutional import Conv2D,
 from keras.layers.pooling import MaxPooling2D
+from multiprocessing import Process
 
 import ConfigParser
 import logging
@@ -75,4 +76,10 @@ def load_data_val(valfile):
         writer=htk.open(filename_val+'.htk',mode='w',veclen=data.shape[1])
         del data
 
+p1=Process(target=load_data_train)
+p2=Process(target=load_data_test)
+p3=Process(target=load_data_val)
+p3.start()
+p2.start()
+p1.start()
 
