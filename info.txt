@@ -34,3 +34,6 @@ Update[Done with feature generation,9/6/17]:
 On some features to try out:
 Gini index[Which kind of tries to measure the inharmonicity of the structure ]
 
+Update[17/6/17]:
+We will also need to analyze if male and female effects are effecting it, and also if the pitch estimates can help.
+The data file has a very large size and also need to reduce that. Maybe reduce the data on the fly, or reduce the number of training, validation and test samples.
