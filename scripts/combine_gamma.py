@@ -5,6 +5,29 @@ import time
 import numpy as np
 import scipy.io as sio
 import htkmfc as htk
+
+# If female then mark her as 0 and if male then mark as 1
+# Now for any kind of combination, we take both the ids and concatenate them, and store as int
+
+def return_vec(x,id1,id2):
+        vector=np.zeros((len(x),1))
+        first_index=np.where(x==1)[0][0] #Storing the part from where speaker change and subsequently second speaker starts
+        for i in range(len(x)):
+                if x[i]==1:
+                        vector[i]=str(id1)+str(id2)
+                if x[i]==0:
+                        if i<first_index:
+                                vector[i]=(str(id1)+str(id1))
+                        else:
+                                vector[i]=(str(id2)+str(id2))
+        if len(vector)==len(x):
+                return vector
+        else:
+                print "Something is wrong in the return_vec function"
+
+def filter_data(x):
+        return x[(x[:,-1]==0) | (x[:,-1]==1)]
+
 def file_opener(file_read):
         file_reader=open(file_read)
         file_reader=file_reader.read()
@@ -17,7 +40,8 @@ def changedir():
 
 def data_creator(num,addr,file_reader,filename):
         corrupt_files=0
-        ind=0
+        noscdlab=0
+        scdlab=0
         matrix=np.empty((0,num))
         changedir()
         writer=htk.open(filename+'.htk',mode='w',veclen=num) #num is the final feature vector size to be written(including the label. Ensure that by looking at the botttom entry)
@@ -30,19 +54,27 @@ def data_creator(num,addr,file_reader,filename):
 
                 ### Kurtosis and sfm are row vectors, that is (1,Number of frames)
                 ### GAMMATONE -- LABEL   <--- Structure of the final matrix
-                try:
-                        read_data=data_read.getall()
-                        # print "Shape of Read Data: ",read_data.shape
+                # try:
+                read_data=data_read.getall()
+                read_data=filter_data(read_data)
+                scdlab+=len(np.where(read_data[:,-1]==1)[0])
+                noscdlab+=read_data.shape[0]-len(np.where(read_data[:,-1]==1)[0])
+                        #id1 and id2 are integers essentially. if male then 1, if female than 0
+                id1=(0,1)[(file_reader[i][0]=='M')==True]
+                temp_index=file_reader[i].index("-")
+                id2=(0,1)[(file_reader[i][temp_index+1]=='M')==True]
+                gender_label=return_vec(read_data[:,-1],id1,id2)
                         # kurt_vector=np.transpose(kurt_matrix)
                         # sfm_vector=np.transpose(sfm_matrix)
                         # label_vector=np.transpose(labels_this_file)
                         # final_vector=np.hstack((read_data,kurt_vector,sfm_vector,label_vector))
-                        final_vector=read_data
+                final_vector=np.hstack((read_data,gender_label))
                         # matrix=np.vstack((matrix,final_vector))
-                        del read_data
-                except:
-                        corrupt_files+=1
-                        continue
+                del read_data
+                # except:
+                        # print "In the corrupt file section"
+                        # corrupt_files+=1
+                        # continue
                         # ind=ind+read_data.shape[0]
                 #HTK supports concatenation, so we don't have to deal with numpy matrix again and again
                 writer.writeall(final_vector)
@@ -53,9 +85,9 @@ addr='/home/siddharthm/scd/context/'+str(sys.argv[1])#address of the HTK files s
 # kurt_addr='/home/siddharthm/scd/feats/kurt/'+str(sys.argv[1])
 # sfm_addr='/home/siddharthm/scd/feats/sfm/'+str(sys.argv[1])
 # label_addr='/home/siddharthm/scd/vad/'+str(sys.argv[1])
-num=40*64+1 #The length of the feature vector, to be read and stored in the htk format[Right now,40*64 Gammatone+1 Label]
+num=40*64+1+1 #The length of the feature vector, to be read and stored in the htk format[Right now,40*64 Gammatone+1 Label+1 gender]
 file_read='/home/siddharthm/scd/lists/'+str(sys.argv[2]) #The raw filenames, in the form of list
-filename='gamma-labels-'+str(sys.argv[3]) #The name of the file where stuff is going to be stored
+filename='gamma-labels-gender-'+str(sys.argv[3]) #The name of the file where stuff is going to be stored
 file_reader=file_opener(file_read) #Calling the function to read the list of files
 # file_reader=['FAJW0_I1263-FCYL0_X349-9346','FAJW0_I1263-FGCS0_X226-13892']
 data_creator(num,addr,file_reader,filename) #Finally call the data creator
