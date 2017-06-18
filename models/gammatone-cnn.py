@@ -1,8 +1,5 @@
-
 # coding: utf-8
-
 # In[7]:
-
 
 import numpy as np
 import htkmfc as htk
@@ -19,7 +16,7 @@ from keras.optimizers import SGD, Adam, RMSprop
 from keras.utils import np_utils
 from keras.regularizers import l2
 from keras.callbacks import ModelCheckpoint
-from keras.layers.convolutional import Conv2D,
+from keras.layers.convolutional import Conv2D
 from keras.layers.pooling import MaxPooling2D
 
 import ConfigParser
@@ -30,32 +27,27 @@ import os
 
 np.random.seed(1337)
 epoch=10 #Number of iterations to be run on the model while training
-trainfile=''
-testfile=''
-valfile=''
-# perc=0.5 #To control how much rogue data we are letting in
+trainfile='/home/siddharthm/scd/combined/gamma-labels-gender-train.htk'
+testfile='/home/siddharthm/scd/combined/gamma-labels-gender-test.htk'
+valfile='/home/siddharthm/scd/combined/gamma-labels-gender-val.htk'
 
 #Now the data has the format that last column has the label, and the rest of stuff needs to be reshaped.
 #The format for reshaping is as follows: Rows = Number of filters X Context size(40 in this case)
 def cnn_reshaper(Data):
-        dat
+        dat=np.reshape(Data,(Data.shape[0],1,64,40)) #The format is: Number of samples, Channels, Rows, Columns
         return dat
 
-def filter_data(x):
-        ### Filter the data. That is only keep 0 or 1 classes.
-        return x[ (x[:,-1]==0)|(x[:,-1]==1)]
 def load_data_train(trainfile):
         print "Getting the training data"
         a=htk.open(trainfile)
         train_data=a.getall()
         print "Done with Loading the training data: ",train_data.shape
-        data=filter_data(train_data)
-        x_train=data[:,:-1] #Set to different column based on different model
+        data=train_data
+        x_train=cnn_reshaper(data[:,:-1]) #Set to different column based on different model
         Y_train=data[:,-1]
         print Y_train.shape
-        print np.where(Y_train==2)
+        # print np.where(Y_train==2)
         Y_train=Y_train.reshape(Y_train.shape[0],1)
-        Y_train=Y_train.astype(np.int8)
         y_train=np_utils.to_categorical(Y_train,2)
         del data
         return x_train,y_train
@@ -63,8 +55,7 @@ def load_data_test(testfile):
         a=htk.open(testfile)
         data=a.getall()
         print "Done loading the testing data: ",data.shape
-        data=filter_data(data)
-        x_test=data[:,:-1]
+        x_test=cnn_reshaper(data[:,:-1])
         Y_test=data[:,-1]
         print np.where(Y_test==2)
         # Y_test=np.reshape(Y_test,(Y_test.shape[0],1))
@@ -75,8 +66,7 @@ def load_data_val(valfile):
         a=htk.open(valfile)
         data=a.getall()
         print "Done loading the validation data: ",data.shape
-        data=filter_data(data)
-        x_val=data[:,:-1]
+        x_val=cnn_reshaper(data[:,:-1])
         Y_val=data[:,-1]
         Y_val=np.reshape(Y_val,(Y_val.shape[0],1))
         y_val=np_utils.to_categorical(Y_val,2)
@@ -84,6 +74,7 @@ def load_data_val(valfile):
         return x_val,y_val
 
 def metrics(y_test,predictions,classes):
+        #We have to modify this to include metrics to capture variations between male and female and blah-blah
         correct_change=0
         #print predictions[0:15,1]
         #classes=np_utils.probas_to_classes(predictions)
@@ -97,22 +88,27 @@ def metrics(y_test,predictions,classes):
         ### ------------- ###
 
 
-# In[2]:
-
-
 ### THE MODEL and ALL ###
 def seq(x_train,y_train,x_val,y_val,x_test,y_test):
         #Defining the structure of the neural network
         #Creating a Network, with 2 Convolutional layers
         model=Sequential()
-        model.add(Dense(256,activation='relu',input_dim=(41))) #Hidden layer1
-        model.add(Dense(256,activation='relu')) #Hidden layer 2
+        model.add(Conv2D(64,(5,3)),activation='relu',input_shape=(1,64,40))
+        model.add(Conv2D(64,(5,3),activation='relu'))
+        model.add(MaxPooling2D((3,3)))
+        model.add(Flatten())
+        model.add(Dropout(0.5))
+        model.add(Dense(256,activation='relu')) #Fully connected layer 1
+        model.add(Dropout(0.5))
+        model.add(Dense(256,activation='relu')) #Fully connected layer 2
         model.add(Dropout(0.5))
         model.add(Dense(2,activation='softmax')) #Output Layer
+        model.summary()
         #Compilation region: Define optimizer, cost function, and the metric?
         model.compile(optimizer='adam',loss='binary_crossentropy',metrics=['accuracy'])
+
         #Fitting region:Get to fit the model, with training data
-        checkpointer=ModelCheckpointkeras predict classeskeras predict classes(filepath=direc+common_save+'.json',monitor='val_acc',save_best_only=True,save_weights_only=True)
+        checkpointer=ModelCheckpoint(filepath=direc+common_save+'.json',monitor='val_acc',save_best_only=True,save_weights_only=True)
 
         #Doing the training[fitting]
         model.fit(x_train,y_train,epochs=10,batch_size=batch,validation_data=(x_val,y_val),callbacks=[checkpointer])
