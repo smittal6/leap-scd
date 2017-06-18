@@ -9,6 +9,8 @@ import htkmfc as htk
 # If female then mark her as 0 and if male then mark as 1
 # Now for any kind of combination, we take both the ids and concatenate them, and store as int
 
+percentage_to_keep=0.65
+
 def return_vec(x,id1,id2):
         vector=np.zeros((len(x),1))
         first_index=np.where(x==1)[0][0] #Storing the part from where speaker change and subsequently second speaker starts
@@ -26,7 +28,13 @@ def return_vec(x,id1,id2):
                 print "Something is wrong in the return_vec function"
 
 def filter_data(x):
-        return x[(x[:,-1]==0) | (x[:,-1]==1)]
+        type1=x[x[:,-1]==0]
+        type2=x[x[:,-1]==1]
+        keep=int(percentage_to_keep*type1.shape[0])
+        np.random.shuffle(type2)
+        type1=type1[keep,:]
+        return_mat=np.vstack((type1,type2))
+        return return_mat
 
 def file_opener(file_read):
         file_reader=open(file_read)
