@@ -1,8 +1,4 @@
 
-# coding: utf-8
-
-# In[7]:
-
 
 import numpy as np
 import htkmfc as htk
@@ -62,10 +58,6 @@ def load_data_val(valfile):
         writer=htk.open(filename_val+'.htk',mode='w',veclen=data.shape[1])
         del data
 
-p1=Process(target=load_data_train(trainfile))
-p2=Process(target=load_data_test(testfile))
-p3=Process(target=load_data_val(valfile))
-p3.start()
-p2.start()
-p1.start()
-
+load_data_val(valfile)
+load_data_test(testfile)
+load_data_train(trainfile)
