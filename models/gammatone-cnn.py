@@ -1,5 +1,3 @@
-# coding: utf-8
-# In[7]:
 
 import numpy as np
 import htkmfc as htk
@@ -43,8 +41,8 @@ def load_data_train(trainfile):
         train_data=a.getall()
         print "Done with Loading the training data: ",train_data.shape
         data=train_data
-        x_train=cnn_reshaper(data[:,:-1]) #Set to different column based on different model
-        Y_train=data[:,-1]
+        x_train=cnn_reshaper(data[:,:-2]) #Set to different column based on different model
+        Y_train=data[:,-2]
         print Y_train.shape
         # print np.where(Y_train==2)
         Y_train=Y_train.reshape(Y_train.shape[0],1)
@@ -55,19 +53,20 @@ def load_data_test(testfile):
         a=htk.open(testfile)
         data=a.getall()
         print "Done loading the testing data: ",data.shape
-        x_test=cnn_reshaper(data[:,:-1])
-        Y_test=data[:,-1]
+        x_test=cnn_reshaper(data[:,:-2])
+        Y_test=data[:,-2]
         print np.where(Y_test==2)
         # Y_test=np.reshape(Y_test,(Y_test.shape[0],1))
         # y_test=np_utils.to_categorical(Y_test,2)
+        gender_labels=data[:,-1]
         del data
-        return x_test,Y_test
+        return x_test,Y_test,gender_labels
 def load_data_val(valfile):
         a=htk.open(valfile)
         data=a.getall()
         print "Done loading the validation data: ",data.shape
-        x_val=cnn_reshaper(data[:,:-1])
-        Y_val=data[:,-1]
+        x_val=cnn_reshaper(data[:,:-2])
+        Y_val=data[:,-2]
         Y_val=np.reshape(Y_val,(Y_val.shape[0],1))
         y_val=np_utils.to_categorical(Y_val,2)
         del data
@@ -136,7 +135,7 @@ def seq(x_train,y_train,x_val,y_val,x_test,y_test):
 #Non-function section
 x_train,y_train=load_data_train(trainfile)
 print "Loading training data complete"
-x_test,y_test=load_data_test(testfile)
+x_test,y_test,gender_labels=load_data_test(testfile)
 print "Loading testing data complete"
 x_val,y_val=load_data_val(valfile)
 print "Loading validation data complete"
@@ -164,5 +163,5 @@ y_test,predictions,classes=seq(x_train,y_train,x_val,y_val,x_test,y_test) #Calli
 # In[8]:
 
 
-metrics(y_test,predictions,classes)
+metrics(y_test,predictions,classes,gender_labels)
 
