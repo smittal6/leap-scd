@@ -9,7 +9,8 @@ import htkmfc as htk
 # If female then mark her as 0 and if male then mark as 1
 # Now for any kind of combination, we take both the ids and concatenate them, and store as int
 
-percentage_to_keep=0.65
+percentage_to_keep=0.5
+keep_true=0.7
 
 def return_vec(x,id1,id2):
         vector=np.zeros((len(x),1))
@@ -31,8 +32,11 @@ def filter_data(x):
         type1=x[x[:,-1]==0]
         type2=x[x[:,-1]==1]
         keep=int(percentage_to_keep*type1.shape[0])
+        keep2=int(keep_true*type2.shape[0])
         np.random.shuffle(type2)
-        type1=type1[keep,:]
+        np.random.shuffle(type1)
+        type1=type1[0:keep,:]
+        type2=type2[0:keep2,:]
         return_mat=np.vstack((type1,type2))
         return return_mat
 
