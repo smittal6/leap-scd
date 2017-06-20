@@ -1,4 +1,3 @@
-
 import numpy as np
 import htkmfc as htk
 import scipy.io as sio
@@ -6,9 +5,9 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from keras.preprocessing import sequence
 from keras.models import Sequential
-from keras.layers import Dense, Dropout, Embedding, LSTM, Input, Bidirectional
+from keras.layers import Dense, Dropout, Embedding, LSTM, Input
 from keras.models import Sequential
-from keras.layers.core import Dense, Dropout, Activation, Reshape, Permute
+from keras.layers.core import Dense, Dropout, Activation, Reshape, Permute, Flatten
 from keras.layers.wrappers import TimeDistributed
 from keras.optimizers import SGD, Adam, RMSprop
 from keras.utils import np_utils
@@ -92,7 +91,7 @@ def seq(x_train,y_train,x_val,y_val,x_test,y_test):
         #Defining the structure of the neural network
         #Creating a Network, with 2 Convolutional layers
         model=Sequential()
-        model.add(Conv2D(64,(5,3)),activation='relu',input_shape=(1,64,40))
+        model.add(Conv2D(64,(5,3),activation='relu',input_shape=(1,64,40)))
         model.add(Conv2D(64,(5,3),activation='relu'))
         model.add(MaxPooling2D((3,3)))
         model.add(Flatten())
