@@ -37,3 +37,10 @@ Gini index[Which kind of tries to measure the inharmonicity of the structure ]
 Update[17/6/17]:
 We will also need to analyze if male and female effects are effecting it, and also if the pitch estimates can help.
 The data file has a very large size and also need to reduce that. Maybe reduce the data on the fly, or reduce the number of training, validation and test samples.
+
+Update[21/6/17]:
+For gammatone features, here is the workflow:
+First for each file, find the gamamatone features. Store them in feats/gamma folder
+Next, for each instance in a file, find it context, and then store it in context, possibly with subfolder indicating how much context
+Now, combine all the context, this is also where the filtering happens
+Just input this to the model
