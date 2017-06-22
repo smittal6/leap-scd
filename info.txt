@@ -40,7 +40,7 @@ The data file has a very large size and also need to reduce that. Maybe reduce t
 
 Update[21/6/17]:
 For gammatone features, here is the workflow:
-First for each file, find the gamamatone features. Store them in feats/gamma folder
-Next, for each instance in a file, find it context, and then store it in context, possibly with subfolder indicating how much context
-Now, combine all the context, this is also where the filtering happens
+[read_gamma_feats.m]First for each file, find the gamamatone features. Store them in feats/gamma folder
+[convert_to_htk.m]Next, for each instance in a file, find it context, and then store it in context, possibly with subfolder indicating how much context
+[combine_gamma.py, run with combine.sh]Now, combine all the context, this is also where the filtering happens
 Just input this to the model
