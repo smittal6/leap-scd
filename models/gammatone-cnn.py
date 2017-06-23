@@ -24,9 +24,9 @@ import os
 
 np.random.seed(1337)
 epoch=10 #Number of iterations to be run on the model while training
-trainfile='/home/siddharthm/scd/combined/gamma-labels-gender-train.htk'
-testfile='/home/siddharthm/scd/combined/gamma-labels-gender-test.htk'
-valfile='/home/siddharthm/scd/combined/gamma-labels-gender-val.htk'
+trainfile='/home/siddharthm/scd/combined/400-gamma-labels-gender-train.htk'
+#testfile='/home/siddharthm/scd/combined/gamma-labels-gender-test.htk'
+valfile='/home/siddharthm/scd/combined/400-gamma-labels-gender-val.htk'
 
 #Now the data has the format that last column has the label, and the rest of stuff needs to be reshaped.
 #The format for reshaping is as follows: Rows = Number of filters X Context size(40 in this case)
@@ -71,7 +71,7 @@ def load_data_val(valfile):
         del data
         return x_val,y_val
 
-def metrics(y_test,predictions,classes):
+def metrics(y_val,predictions,classes):
         #We have to modify this to include metrics to capture variations between male and female and blah-blah
         correct_change=0
         #print predictions[0:15,1]
@@ -91,14 +91,10 @@ def seq(x_train,y_train,x_val,y_val,x_test,y_test):
         #Defining the structure of the neural network
         #Creating a Network, with 2 Convolutional layers
         model=Sequential()
-        model.add(Conv2D(64,(5,3),activation='relu',input_shape=(1,64,40)))
-        model.add(Conv2D(64,(5,3),activation='relu'))
-        model.add(MaxPooling2D((3,3)))
+        model.add(Conv2D(64,(3,5),activation='relu',input_shape=(1,64,40)))
+        model.add(MaxPooling2D((2,2)))
         model.add(Flatten())
-        model.add(Dropout(0.5))
         model.add(Dense(256,activation='relu')) #Fully connected layer 1
-        model.add(Dropout(0.5))
-        model.add(Dense(256,activation='relu')) #Fully connected layer 2
         model.add(Dropout(0.5))
         model.add(Dense(2,activation='softmax')) #Output Layer
         model.summary()
@@ -119,23 +115,23 @@ def seq(x_train,y_train,x_val,y_val,x_test,y_test):
         ### ------------- ###
 
         ### SAVING THE TESTING DATA ###
-        scores_test=model.predict(x_test,batch_size=batch)
-        sio.savemat(direc+name_test+'.mat',{'scores':scores_test,'ytest':y_test})
+        #scores_test=model.predict(x_test,batch_size=batch)
+        #sio.savemat(direc+name_test+'.mat',{'scores':scores_test,'ytest':y_test})
         ### ------------- ###
         # print model.evaluate(x_test,y_test,batch_size=batch)
         ### For finding the details of classification ###
-        correct_change=0
-        predictions=model.predict(x_test,batch_size=batch)
-        classes=model.predict_classes(x_test,batch_size=batch)
+        #correct_change=0
+        #predictions=model.predict(x_test,batch_size=batch)
+        classes=model.predict_classes(x_val,batch_size=batch)
         print "Shape of predictions: ", predictions.shape
         print "Shape of y_test: ",y_test.shape
-        return y_test,predictions,classes
+        return classes
 
 #Non-function section
 x_train,y_train=load_data_train(trainfile)
 print "Loading training data complete"
-x_test,y_test,gender_labels=load_data_test(testfile)
-print "Loading testing data complete"
+#x_test,y_test,gender_labels=load_data_test(testfile)
+#print "Loading testing data complete"
 x_val,y_val=load_data_val(valfile)
 print "Loading validation data complete"
 
@@ -145,7 +141,7 @@ print "Loading validation data complete"
 
 ### SHAPE TESTS ###
 print "Train Shape: ",x_train.shape," ",y_train.shape
-print "Test Shape: ",x_test.shape," ",y_test.shape
+#print "Test Shape: ",x_test.shape," ",y_test.shape
 print "Val Shape: ",x_val.shape," ",y_val.shape
 ###
 
@@ -153,14 +149,12 @@ print "Val Shape: ",x_val.shape," ",y_val.shape
 epoch=20 #Number of iterations to be run on the model while training
 batch=1024 #Batch size to be used while training
 direc="/home/siddharthm/scd/scores/"
-common_save='2dnn-mfcc-d-a-kurt-sfm'
+common_save='gammatone-cnn'
 name_val=common_save+'-val'
-name_test=common_save+'-test'
-y_test,predictions,classes=seq(x_train,y_train,x_val,y_val,x_test,y_test) #Calling the seq model, with 2 hidden layers
+#name_test=common_save+'-test'
+#y_test,predictions,classes=seq(x_train,y_train,x_val,y_val,x_test,y_test) #Calling the seq model, with 2 hidden layers
+classes=seq(x_train,y_train,x_val,y_val,0,0) #Calling the seq model, with 2 hidden layers
 
 
-# In[8]:
-
-
-metrics(y_test,predictions,classes,gender_labels)
+#metrics(classes,gender_labels)
 
