@@ -27,6 +27,13 @@ epoch=10 #Number of iterations to be run on the model while training
 trainfile='/home/siddharthm/scd/combined/400-mfcc-labels-gender-train.htk'
 #testfile='/home/siddharthm/scd/combined/gamma-labels-gender-test.htk'
 valfile='/home/siddharthm/scd/combined/400-mfcc-labels-gender-val.htk'
+#Some parameters for training the model
+epoch=20 #Number of iterations to be run on the model while training
+batch=1024*2 #Batch size to be used while training
+direc="/home/siddharthm/scd/scores/"
+common_save='mfcc-cnn'
+name_val=common_save+'-val'
+#name_test=common_save+'-test'
 
 #Now the data has the format that last column has the label, and the rest of stuff needs to be reshaped.
 #The format for reshaping is as follows: Rows = Number of filters X Context size(40 in this case)
@@ -46,8 +53,9 @@ def load_data_train(trainfile):
         # print np.where(Y_train==2)
         Y_train=Y_train.reshape(Y_train.shape[0],1)
         y_train=np_utils.to_categorical(Y_train,2)
+        gender_train=data[:,-1]
         del data
-        return x_train,y_train
+        return x_train,y_train,gender_train
 def load_data_test(testfile):
         a=htk.open(testfile)
         data=a.getall()
@@ -68,36 +76,76 @@ def load_data_val(valfile):
         Y_val=data[:,-2]
         Y_val=np.reshape(Y_val,(Y_val.shape[0],1))
         y_val=np_utils.to_categorical(Y_val,2)
+        gender_val=data[:,-1]
         del data
-        return x_val,y_val
+        return x_val,y_val,gender_val
+def data_saver(data):
+        os.chdir('/home/siddharthm/combined')
+        f=open(common_save+'-complete.txt','rb+')
+        f.write('\n')
+        f.write(data)
+        f.close()
 
-def metrics(y_val,predictions,classes):
+def metrics(y_val,classes,gender_val):
         #We have to modify this to include metrics to capture variations between male and female and blah-blah
-        correct_change=0
-        #print predictions[0:15,1]
-        #classes=np_utils.probas_to_classes(predictions)
+        #initializing the two matrixes to be saved.
+        cd_correct_matrix=np.zeros((2,2))
+        single_correct_matrix=np.zeros((2,2))
+        cd_incorrect_matrix=np.zeros((2,2))
+        single_incorrect_matrix=np.zeros((2,2))
         print classes.shape
-        print np.where(classes==1)
-        for i in range(len(x_test)):
-            if y_test[i]==1 and classes[i]==1:
-                correct_change+=1
-        print "Correct changes detected: ",correct_change
-        print "Total speaker change frames: ",len(y_test[y_test==1])
+        #print np.where(classes==1) #classes must be one dimensional vector here
+
+        #We need a matrix, one of correctly classified changes, and the other of incorrectly classified changes.
+        for i in range(len(y_val)):
+                id1=int(gender_val[i][0])
+                id2=int(gender_val[i][1])
+                if y_test[i]==1:
+                        if classes[i]==1:
+                                cd_correct_matrix[id1][id2]+=1
+                        else:
+                                cd_incorrect_matrix[id1][id2]+=1
+                else:
+                        if classes[i]==0:
+                                single_correct_matrix[id1][id2]+=1
+                        else:
+                                single_incorrect_matrix[id1][id2]+=1
+        data_saver('Speaker changes Correct detected')
+        data_saver(cd_correct_matrix)
+        data_saver('Speaker changes wrongly classified')
+        data_saver(cd_incorrect_matrix)
+        data_saver('Single speaker frames correct')
+        data_saver(single_correct_matrix)
+        data_saver('Single speaker frames wrongly classified')
+        data_saver(single_incorrect_matrix)
         ### ------------- ###
 
+#Non-function section
+x_train,y_train,gender_train=load_data_train(trainfile)
+print "Loading training data complete"
+#x_test,y_test,gender_labels=load_data_test(testfile)
+#print "Loading testing data complete"
+x_val,y_val,gender_val=load_data_val(valfile)
+print "Loading validation data complete"
+## SHAPE TESTS ###
+print "Train Shape: ",x_train.shape," ",y_train.shape
+#print "Test Shape: ",x_test.shape," ",y_test.shape
+print "Val Shape: ",x_val.shape," ",y_val.shape
+###
 
 ### THE MODEL and ALL ###
 def seq(x_train,y_train,x_val,y_val,x_test,y_test):
         #Defining the structure of the neural network
         #Creating a Network, with 2 Convolutional layers
         model=Sequential()
-        model.add(Conv2D(64,(3,5),activation='relu',input_shape=(1,39,40)))
+        model.add(Conv2D(64,(3,3),activation='relu',input_shape=(1,39,40)))
         model.add(MaxPooling2D((2,2)))
         model.add(Flatten())
         model.add(Dense(256,activation='relu')) #Fully connected layer 1
         model.add(Dropout(0.5))
         model.add(Dense(2,activation='softmax')) #Output Layer
         model.summary()
+        data_saver(model.summary())
         #Compilation region: Define optimizer, cost function, and the metric?
         model.compile(optimizer='adam',loss='binary_crossentropy',metrics=['accuracy'])
 
@@ -112,6 +160,7 @@ def seq(x_train,y_train,x_val,y_val,x_test,y_test):
         ### SAVING THE VALIDATION DATA ###
         scores=model.predict(x_val,batch_size=batch)
         sio.savemat(direc+name_val+'.mat',{'scores':scores,'ytest':y_val}) #These are the validation scores.
+        classes=model.predict_classes(x_val,batch_size=batch)
         ### ------------- ###
 
         ### SAVING THE TESTING DATA ###
@@ -119,45 +168,15 @@ def seq(x_train,y_train,x_val,y_val,x_test,y_test):
         #sio.savemat(direc+name_test+'.mat',{'scores':scores_test,'ytest':y_test})
         ### ------------- ###
         # print model.evaluate(x_test,y_test,batch_size=batch)
-        ### For finding the details of classification ###
-        #correct_change=0
-        #predictions=model.predict(x_test,batch_size=batch)
-        classes=model.predict_classes(x_val,batch_size=batch)
-        print "Shape of predictions: ", predictions.shape
-        print "Shape of y_test: ",y_test.shape
+
+        #predictions=model.predict(x_val,batch_size=batch)
+        #print "Shape of predictions: ", predictions.shape
+        #print "Shape of y_test: ",y_test.shape
         return classes
 
 #Non-function section
-x_train,y_train=load_data_train(trainfile)
-print "Loading training data complete"
-#x_test,y_test,gender_labels=load_data_test(testfile)
-#print "Loading testing data complete"
-x_val,y_val=load_data_val(valfile)
-print "Loading validation data complete"
 
-#Reahaping the data section 
-
-#### ----- ####
-
-### SHAPE TESTS ###
-print "Train Shape: ",x_train.shape," ",y_train.shape
-#print "Test Shape: ",x_test.shape," ",y_test.shape
-print "Val Shape: ",x_val.shape," ",y_val.shape
-###
-
-#Some parameters for training the model
-epoch=20 #Number of iterations to be run on the model while training
-batch=1024 #Batch size to be used while training
-direc="/home/siddharthm/scd/scores/"
-common_save='gammatone-cnn'
-name_val=common_save+'-val'
-#name_test=common_save+'-test'
 #y_test,predictions,classes=seq(x_train,y_train,x_val,y_val,x_test,y_test) #Calling the seq model, with 2 hidden layers
 classes=seq(x_train,y_train,x_val,y_val,0,0) #Calling the seq model, with 2 hidden layers
-
-
-# In[8]:
-
-
-#metrics(classes,gender_labels)
+# metrics(y_val,classes,gender_val)
 
