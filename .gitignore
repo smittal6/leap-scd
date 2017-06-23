@@ -1,12 +1,13 @@
 *.pyc
 *.swp
 *.ipynb
-*.list
+/**.list*/
 *.out
 feats/
 wav/
 vad/
 combined/
+context/
 scores/
 lists/trainfiles/
 lists/testfiles/
