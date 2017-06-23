@@ -44,3 +44,8 @@ For gammatone features, here is the workflow:
 [convert_to_htk.m]Next, for each instance in a file, find it context, and then store it in context, possibly with subfolder indicating how much context
 [combine_gamma.py, run with combine.sh]Now, combine all the context, this is also where the filtering happens
 Just input this to the model
+
+Update[23/6/17]
+feats is complete[both gamma and mfcc]
+Complete the context generation
+For combining the files, combine the files into smaller ones, say 12 L samples or so
