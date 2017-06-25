@@ -1,17 +1,17 @@
 clear all; clc;
-poolsize = 6;
+poolsize = 16;
 parpool(poolsize);
 %Par parameters are for parallel processing of the files
 % ----- update the path to respective directories
-label_addr = '/hare/rajathk/neerajs/scd/vad/train/';
+label_addr = '/home/siddharthm/scd/vad/train/';
 %mfcc_feats_addr = '/home/neerajs/work/NEW_REGIME/SID/FEATS/mfcc_after/train/';
 %kurt_feats_addr = '/home/neerajs/work/NEW_REGIME/SID/FEATS/kurt_after/val/';
 %sfm_feats_addr = '/home/neerajs/work/NEW_REGIME/SID/FEATS/sfm_after/val/';mel_feats_addr = '/home/neerajs/work/NEW_REGIME/SID/FEATS/mel_after/train_4Khz/';
 %linear_feats_addr='/home/neerajs/work/NEW_REGIME/SID/FEATS/linear_after/train/';
-EXTRA='/home/siddharthm/scd/feats/mfcc/train/';
-context_addr = '/home/siddharthm/scd/context/400/mfcc/train/';
+EXTRA='/home/siddharthm/scd/feats/mfcc/val/';
+context_addr = '/home/siddharthm/scd/context/400/mfcc/';
 % ----- list of files
-f=fopen('/hare/rajathk/neerajs/scd/lists/rawtrainfiles.list');
+f=fopen('/home/siddharthm/scd/lists/rawvalfiles.list');
 f=textscan(f,'%s');
 len=cellfun('length',f)
 type = 'EXTRA';
@@ -58,14 +58,14 @@ end
 % Data is now of the form 64 X Number of frames
 
 % Displaying the size of Data input and the the file
-%size(data)
+size(data)
 f{1}{i}
 %pause
 % read each feature file and make context feature file
 nframes = size(data,2);
 %data_write = zeros(nframes,(2*context_size+1)*size(data,1));
 
-temp_matrix=zeros(64,40);
+temp_matrix=zeros(39,40);
 final_matrix=zeros(size(data,2)-40+1,40*size(data,1)+1); % The dimensions of the final matrix to be saved
 % The rows are essentially the number of frames we can construct, which is given by number-shift+1
 start=1;

@@ -10,7 +10,7 @@ import htkmfc as htk
 # Now for any kind of combination, we take both the ids and concatenate them, and store as int
 
 percentage_to_keep=0.5
-keep_true=0.7
+keep_true=0.9
 
 def return_vec(x,id1,id2):
         vector=np.zeros((len(x),1))
@@ -47,7 +47,7 @@ def file_opener(file_read):
         file_reader=re.split('\n',file_reader)
         return file_reader
 def changedir():
-        os.chdir('/home/siddharthm/scd/combined')
+        os.chdir(cwd)
         print "Current working directory: ",os.getcwd()
 
 def data_creator(num,addr,file_reader,filename):
@@ -97,14 +97,15 @@ def data_creator(num,addr,file_reader,filename):
         f.close()
 
 # First sys input is whether test/, train/ or val/ and second input is trainfile.list or ...., third is train, test or val
-addr='/home/siddharthm/scd/context/'+str(sys.argv[1])#address of the HTK files stored somewhere
+addr='/hare/rajathk/neerajs/scd/context/400/gamma/'+str(sys.argv[1])#address of the HTK files stored somewhere
+cwd='/hare/rajathk/neerajs/scd/combined' #The directory where we will change the address of 
 # kurt_addr='/home/siddharthm/scd/feats/kurt/'+str(sys.argv[1])
 # sfm_addr='/home/siddharthm/scd/feats/sfm/'+str(sys.argv[1])
 # label_addr='/home/siddharthm/scd/vad/'+str(sys.argv[1])
 num=40*64+1+1 #The length of the feature vector, to be read and stored in the htk format[Right now,40*64 Gammatone+1 Label+1 gender]
-file_read='/home/siddharthm/scd/lists/'+str(sys.argv[2]) #The raw filenames, in the form of list
-filename='gamma-labels-gender-'+str(sys.argv[3]) #The name of the file where stuff is going to be stored
+file_read='/hare/rajathk/neerajs/scd/lists/'+str(sys.argv[2]) #The raw filenames, in the form of list
+filename='400-gamma-labels-gender-'+str(sys.argv[3]) #The name of the file where stuff is going to be stored
 save_extra='extra-'+str(sys.argv[3])+'.txt' #For saving the count of lables
-file_reader=file_opener(file_read) #Calling the function to read the list of files
+file_reader=file_opener(file_read)[0:10000] #Calling the function to read the list of files
 # file_reader=['FAJW0_I1263-FCYL0_X349-9346','FAJW0_I1263-FGCS0_X226-13892']
 data_creator(num,addr,file_reader,filename) #Finally call the data creator
