@@ -1,17 +1,17 @@
 clear all; clc;
-poolsize = 16;
+poolsize = 4;
 parpool(poolsize);
 %Par parameters are for parallel processing of the files
 % ----- update the path to respective directories
-label_addr = '/home/siddharthm/scd/vad/train/';
+label_addr = '/home/user/work/scd/vad/train/';
 %mfcc_feats_addr = '/home/neerajs/work/NEW_REGIME/SID/FEATS/mfcc_after/train/';
 %kurt_feats_addr = '/home/neerajs/work/NEW_REGIME/SID/FEATS/kurt_after/val/';
 %sfm_feats_addr = '/home/neerajs/work/NEW_REGIME/SID/FEATS/sfm_after/val/';mel_feats_addr = '/home/neerajs/work/NEW_REGIME/SID/FEATS/mel_after/train_4Khz/';
 %linear_feats_addr='/home/neerajs/work/NEW_REGIME/SID/FEATS/linear_after/train/';
-EXTRA='/home/siddharthm/scd/feats/gamma/train/';
-context_addr = '/home/siddharthm/scd/context/400/gamma/';
+EXTRA='/home/user/work/scd/feats/gamma/train/';
+context_addr = '/home/user/work/scd/context/200/gamma/';
 % ----- list of files
-f=fopen('/home/siddharthm/scd/lists/rawvalfiles.list');
+f=fopen('/home/user/work/scd/lists/rawtrainfiles.list');
 f=textscan(f,'%s');
 len=cellfun('length',f)
 type = 'EXTRA';
@@ -65,11 +65,11 @@ f{1}{i}
 nframes = size(data,2);
 %data_write = zeros(nframes,(2*context_size+1)*size(data,1));
 
-temp_matrix=zeros(64,40);
-final_matrix=zeros(size(data,2)-40+1,40*size(data,1)+1); % The dimensions of the final matrix to be saved
+temp_matrix=zeros(64,20);
+final_matrix=zeros(size(data,2)-20+1,20*size(data,1)+1); % The dimensions of the final matrix to be saved
 % The rows are essentially the number of frames we can construct, which is given by number-shift+1
 start=1;
-fin=start+39;
+fin=start+19;
 %We want to take 40 such frames, and store this matrix in a row major order
 while fin < nframes
         %display([index nframes])
@@ -78,7 +78,7 @@ while fin < nframes
         temp_vector=[temp_vector,vad(start)];
         final_matrix(start,:)=temp_vector;
         start=start+1;
-        fin=start+39;
+        fin=start+19;
 end
 %size(final_matrix)
 % save them

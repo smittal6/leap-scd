@@ -1,11 +1,11 @@
 
 % obtaining mel spectrum
 
-poolsize = 8;
+poolsize = 4;
 parpool(poolsize);
 
-path = '/home/siddharthm/scd/wav/val/'; %Path of wav files
-savedir = '/home/siddharthm/scd/feats/gamma/val/'; %The save directory
+path = '/home/user/work/scd/wav/test/'; %Path of wav files
+savedir = '/home/user/work/scd/feats/gamma/test/'; %The save directory
 filename = dir([path '*.wav']);
 len = length(filename);
 Fs_proc = 16e3;
@@ -38,5 +38,3 @@ writehtk(strcat(savedir,filename(i).name(1:end-4),'.htk'),STFTmag,0.01,9);
 %clearvars STFTmag
 
 end
-
-

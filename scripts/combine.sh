@@ -18,8 +18,9 @@
 #python combine_gamma.py val/ rawvalfiles.list val &
 
 #### SECTION for combining mfcc features
-#python combine_mfcc.py train/ rawtrainfiles.list train &
+python combine_mfcc.py train/ rawtrainfiles.list train &
 python combine_mfcc.py val/ rawvalfiles.list val &
+python combine_mfcc.py test/ rawtestfiles.list test &
 
 wait
 echo "Done nigga"
