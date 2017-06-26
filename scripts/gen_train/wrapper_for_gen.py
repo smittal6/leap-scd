@@ -2,7 +2,7 @@ import re
 import numpy as np
 import gen_notebook as gen
 
-f=open('/home/sriram/speech/OverLap/TIMIT/lists/train_files.list')
+f=open('/home/siddharthm/TIMIT_DATAPREP/train_files.list')
 f=f.read()
 f=f.strip()
 f=re.split('\n',f)
