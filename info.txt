@@ -49,3 +49,8 @@ Update[23/6/17]
 feats is complete[both gamma and mfcc]
 Complete the context generation
 For combining the files, combine the files into smaller ones, say 12 L samples or so
+
+Update[26/6/17]
+Labelling according to the new definition, taking 200 ms done. It means we will atleast have an error of 300ms while getting the change points.
+Feats: MFCC all are done, Context all are done, Gamma are being generated
+Combined: MFCC being generated. Should be done by tom.
