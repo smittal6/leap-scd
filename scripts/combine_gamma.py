@@ -9,21 +9,22 @@ import htkmfc as htk
 # If female then mark her as 0 and if male then mark as 1
 # Now for any kind of combination, we take both the ids and concatenate them, and store as int
 
-percentage_to_keep=0.5
-keep_true=0.9
+percentage_to_keep=0.2
+keep_true=1
 
 def return_vec(x,id1,id2):
         vector=np.zeros((len(x),1))
         first_index=np.where(x==1)[0][0] #Storing the part from where speaker change and subsequently second speaker starts
         for i in range(len(x)):
                 if x[i]==1:
-                        vector[i]=str(id1)+str(id2)
+                        vector[i]=int(str(id1)+str(id2))
                 if x[i]==0:
                         if i<first_index:
-                                vector[i]=(str(id1)+str(id1))
+                                vector[i]=int(str(id1)+str(id1))
                         else:
-                                vector[i]=(str(id2)+str(id2))
+                                vector[i]=int(str(id2)+str(id2))
         if len(vector)==len(x):
+                print vector
                 return vector
         else:
                 print "Something is wrong in the return_vec function"
@@ -65,16 +66,16 @@ def data_creator(num,addr,file_reader,filename):
                 # labels_this_file=sio.loadmat(label_addr+file_reader[i]+'.mat')['labels']
 
                 ### Kurtosis and sfm are row vectors, that is (1,Number of frames)
-                ### GAMMATONE -- LABEL   <--- Structure of the final matrix
+                ### GAMMATONE -- LABEL --GenderLabel  <--- Structure of the final matrix
                 try:
                         read_data=data_read.getall()
                         read_data=filter_data(read_data)
                         scdlab+=len(np.where(read_data[:,-1]==1)[0])
                         noscdlab+=read_data.shape[0]-len(np.where(read_data[:,-1]==1)[0])
                         #id1 and id2 are integers essentially. if male then 1, if female than 0
-                        id1=(0,1)[(file_reader[i][0]=='M')==True]
+                        id1=(1,2)[(file_reader[i][0]=='M')==True]
                         temp_index=file_reader[i].index("-")
-                        id2=(0,1)[(file_reader[i][temp_index+1]=='M')==True]
+                        id2=(1,2)[(file_reader[i][temp_index+1]=='M')==True]
                         gender_label=return_vec(read_data[:,-1],id1,id2)
                         # kurt_vector=np.transpose(kurt_matrix)
                         # sfm_vector=np.transpose(sfm_matrix)
@@ -97,15 +98,15 @@ def data_creator(num,addr,file_reader,filename):
         f.close()
 
 # First sys input is whether test/, train/ or val/ and second input is trainfile.list or ...., third is train, test or val
-addr='/hare/rajathk/neerajs/scd/context/400/gamma/'+str(sys.argv[1])#address of the HTK files stored somewhere
-cwd='/hare/rajathk/neerajs/scd/combined' #The directory where we will change the address of 
+addr='/home/siddharthm/scd/context/200/gamma/'+str(sys.argv[1])#address of the HTK files stored somewhere
+cwd='/home/siddharthm/scd/combined' #The directory where we will change the address of 
 # kurt_addr='/home/siddharthm/scd/feats/kurt/'+str(sys.argv[1])
 # sfm_addr='/home/siddharthm/scd/feats/sfm/'+str(sys.argv[1])
 # label_addr='/home/siddharthm/scd/vad/'+str(sys.argv[1])
-num=40*64+1+1 #The length of the feature vector, to be read and stored in the htk format[Right now,40*64 Gammatone+1 Label+1 gender]
+num=20*64+1+1 #The length of the feature vector, to be read and stored in the htk format[Right now,20*64 Gammatone+1 Label+1 gender]
 file_read='/hare/rajathk/neerajs/scd/lists/'+str(sys.argv[2]) #The raw filenames, in the form of list
-filename='400-gamma-labels-gender-'+str(sys.argv[3]) #The name of the file where stuff is going to be stored
-save_extra='extra-'+str(sys.argv[3])+'.txt' #For saving the count of lables
-file_reader=file_opener(file_read)[0:10000] #Calling the function to read the list of files
+filename='200-gamma-labels-gender-'+str(sys.argv[3]) #The name of the file where stuff is going to be stored
+save_extra='200-gamma-extra-'+str(sys.argv[3])+'.txt' #For saving the count of lables
+file_reader=file_opener(file_read) #Calling the function to read the list of files
 # file_reader=['FAJW0_I1263-FCYL0_X349-9346','FAJW0_I1263-FGCS0_X226-13892']
 data_creator(num,addr,file_reader,filename) #Finally call the data creator
