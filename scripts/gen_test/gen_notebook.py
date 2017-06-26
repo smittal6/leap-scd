@@ -1,55 +1,60 @@
 
-# coding: utf-8
-
-# In[37]:
-
-
 #The idea is to just generate the wav file and the ground truth for speaker change detection.
 import re
 import numpy as np
 import scipy.io.wavfile as wav
 import scipy
 import scipy.io as sio
-
+import os
+import htkmfc as htk
 #### DO NOT CHANGE ####
-base='/home/neerajs/work/NEW_REGIME/WAV/'
-clean='clean_wav_test/'
-rev='rev_wav_test/'
-rev_noise='rev_noise_wav_test/'
-rev_inaud='rev_inaud_wav_test/'
-phndir='/home/sriram/speech/OverLap/TIMIT/audio/vad_test/'
+# base='/home/neerajs/work/NEW_REGIME/WAV/'
+base='/home/siddharthm/'
+clean='clean_wav/'
+rev='rev_wav/'
+rev_noise='rev_noise_wav/'
+rev_inaud='rev_inaud_wav/'
+phndir='/home/siddharthm/TIMIT/phones/'
 choices=[clean,rev,rev_noise,rev_inaud]
 #### ------------- ####
 
 wavesavdir='/home/siddharthm/scd/wav/test/' #Save the generated wave file in this dir
 over_addr='/home/siddharthm/scd/vad/test/' #labels in the directory
-
+common_save='test_combinations'
 ### SOME VARIABLE DEFINITIONS ###
-ratio_sc=0.1
-ratio_sil=0.15
-time_decision=200*2 #in milliseconds
+ratio_sc=0.20
+ratio_sil=0.70
+time_decision=200 #in milliseconds
 decision_samples=time_decision*16 #Assuming 16KHz sampling rate
-silence_samples=0.10*decision_samples
+silence_samples=0.10*decision_samples #The number of samples to be inserted[as silence]
 ###
 
 # We are constructing ground truth from Phone files.
 # There are many ways in which we can generate speaker change files. Right now, we are generating by concatenating the two files.
 
-
-
-# In[38]:
-
+def data_saver(data):
+        os.chdir('/home/siddharthm/scd/scores')
+        f=open(common_save+'.list','a')
+        f.write('\n')
+        f.write(str(data))
+        f.close()
 
 def gen_func(file1,file2,input_index):
         print('Begin')
         print(file1,file2,input_index)
+        data_saver(str(file1)+str(file2))
+        ind1=file1.index('_')+1
+        ind2=file2.index('_')+1
+        file1_mod=file1[0:ind1]+file1[ind1+1:]
+        file2_mod=file2[:ind2]+file2[ind2+1:]
         #Fetching the base directory of the working files
-        wav_addr1=base+choices[np.random.randint(3)]
-        wav_addr2=base+choices[np.random.randint(4)]
+        wav_addr1=base+choices[np.random.randint(1)] #Keeping only the clean files
+        wav_addr2=base+choices[np.random.randint(1)] #Same as above
         #reading the two wav files and overlapping them
+        wav_file1_mod=wav_addr1+file1_mod+'.wav'
         wav_file1=wav_addr1+file1+'.wav'
-        # print(wav_file1)
-        wav_file2=wav_addr2+file2+'.wav'
+        wav_file2_mod=wav_addr2+file2_mod+'.wav'
+        wav_file2=wav_addr1+file2+'.wav'
         # print(wav_file2)
         phnFile1=phndir+file1+'.PHN'
         phnFile2=phndir+file2+'.PHN'
@@ -78,10 +83,19 @@ def gen_func(file1,file2,input_index):
         # print "Silence regions, File 2: "
         # print nsFile2
         #Wavfile.read returns the sampling rate and the read data. The sampling rate is assumed to be 16KHz for our purposes.
-        [a1,a2]=wav.read(wav_file1)
-        a2=np.reshape(a2,(1,a2.shape[0])) #a2 is the actual data sample, reshaping it to (1,size)
-        [b1,b2]=wav.read(wav_file2)
-        b2=np.reshape(b2,(1,b2.shape[0])) #b2 is the sample, and reshaping it
+        try:
+                [a1,a2]=wav.read(wav_file1)
+                a2=np.reshape(a2,(1,a2.shape[0])) #a2 is the actual data sample, reshaping it to (1,size)
+        except IOError:
+                [a1,a2]=wav.read(wav_file1_mod)
+                a2=np.reshape(a2,(1,a2.shape[0])) #a2 is the actual data sample, reshaping it to (1,size)
+
+        try:
+                [b1,b2]=wav.read(wav_file2)
+                b2=np.reshape(b2,(1,b2.shape[0])) #b2 is the sample, and reshaping it
+        except IOError:
+                [b1,b2]=wav.read(wav_file2_mod)
+                b2=np.reshape(b2,(1,b2.shape[0])) #b2 is the sample, and reshaping it
 
         #Making them floats
         a2=a2.astype(float)
@@ -130,6 +144,7 @@ def gen_func(file1,file2,input_index):
         # print "Out wav file: ", out.shape
         flabels=[]
         count=0
+        flag=0
         # 2 for the silence class, 1 for speaker change frame, 0 for no speaker change frame
         while end<len(labelFrames):
                 #Getting the vector ready
@@ -139,57 +154,46 @@ def gen_func(file1,file2,input_index):
                 count_zero=len(np.where( aconsider == 0 )[0])
                 count_one=len(np.where( aconsider == 1 )[0])
                 count_two=len(np.where( aconsider == 2 )[0])
-                if count_zero==0 or count_one==0:
-                        sil1=0
-                else:
-                        sil1=float(min(count_zero,count_one))/max(count_zero,count_one)
-                if count_zero==0 or count_two==0:
-                        sil2=0
-                else:
-                        sil2=float(min(count_zero,count_two))/max(count_zero,count_two)
-                if count_one==0 or count_two==0:
-                        change_ratio=0
-                else:
-                        change_ratio=float(min(count_one,count_two))/max(count_one,count_two)
                 #Decision section
-                flag=0
-                dec=-1
-                if sil1>ratio_sil or sil2>ratio_sil:
+                if count_zero*160>int(ratio_sil*decision_samples):
                         dec=2
-                        flag=1
-                if change_ratio > ratio_sc:
+                elif min(count_one,count_two)*160>int(ratio_sc*decision_samples):
                         dec=1
                 else:
-                        if flag == 1:
-                                dec=2
-                        else:
-                                dec=0
+                        dec=0
                 #Update section
-                #print "Decision Taken: ",dec
+                # print "Decision Taken: ",dec
                 # print count_zero,count_one,count_two,dec
+                if dec==2:
+                        count_two+=1
                 if dec==1:
-                    count+=1
+                        count+=1
+                else:
+                        flag+=1
                 flabels.append(dec)
-                #print "Flag: ", flag
+                # print "Flag: ", flag,"Count: ",count
                 iterator+=1
                 start+=1
                 end=skip_entries+start
 
-        # print count
+        print count,flag,count_two
         # print iterator
         ### Setting the labels and the output ###
         out=out.astype(np.int16)
         out=np.reshape(out,(out.shape[0],1)) #Reshaping it to form the vector which is required to be written in wav file
 
         # print "The shape of out vector: ",out.shape
-
+        flabels=np.array(flabels)
+        # print flabels.shape
+        # print type(flabels)
+        flabels=np.reshape(flabels,(1,flabels.shape[0]))
+        # print flabels.shape
         ### SAVING THE STUFF SECTION ###
         scipy.io.wavfile.write(wavesavdir+file1+'-'+file2+'-'+str(input_index)+'.wav',a1,out)
-        scipy.io.savemat(over_addr+file1+'-'+file2+'-'+str(input_index)+'.mat',{'labels':flabels})
+        writer=htk.open(over_addr+file1+'-'+file2+'-'+str(input_index)+'.htk',mode='w',veclen=max(flabels.shape))
+        writer.writeall(flabels)
         ### --------- ###
 
-
-# In[39]:
 
 
 ### TRY CALLS[Actual use with wrapper] ###
