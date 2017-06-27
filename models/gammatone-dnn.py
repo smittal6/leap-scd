@@ -61,6 +61,8 @@ def load_data_train(trainfile):
         data=filter_data_train(train_data)
         # x_train=cnn_reshaper(data[:,:-2]) #Set to different column based on different model
         x_train=data[:,:-2] #Set to different column based on different model
+        scaler=StandardScaler().fit(x_train)
+        x_train=scaler.transform(x_train)
         Y_train=data[:,-2]
         print Y_train.shape
         # print np.where(Y_train==2)
@@ -82,12 +84,13 @@ def load_data_test(testfile):
         gender_labels=data[:,-1]
         del data
         return x_test,Y_test,gender_labels
-def load_data_val(valfile):
+def load_data_val(valfile,scaler):
         a=htk.open(valfile)
         data=a.getall()
         print "Done loading the validation data: ",data.shape
         data=filter_data_val(data)
         x_val=data[:,:-2]
+        x_val=scaler.transform(x_val)
         Y_val=data[:,-2]
         # print np.where(Y_val==1)
         Y_val=np.reshape(Y_val,(Y_val.shape[0],1))
@@ -163,11 +166,11 @@ def metrics(y_val,classes,gender_val):
         ## ------------- ###
 
 #Non-function section
-x_train,y_train,gender_train=load_data_train(trainfile)
+x_train,y_train,gender_train,scaler=load_data_train(trainfile)
 print "Loading training data complete"
 #x_test,y_test,gender_labels=load_data_test(testfile)
 #print "Loading testing data complete"
-x_val,y_val,gender_val=load_data_val(valfile)
+x_val,y_val,gender_val=load_data_val(valfile,scaler)
 # print np.where(y_val[:,1]==1)
 print "Loading validation data complete"
 ## SHAPE TESTS ###
@@ -186,12 +189,15 @@ def seq(x_train,y_train,x_val,y_val,x_test,y_test):
         # model.add(MaxPooling2D((2,2)))
         # model.add(Flatten())
         model.add(Dense(512,activation='relu',input_shape=(1280,)))
+        model.add(Dense(1024,activation='relu')) #Fully connected layer 1
+        model.add(Dropout(0.5))
         model.add(Dense(512,activation='relu')) #Fully connected layer 1
         model.add(Dropout(0.5))
         model.add(Dense(2,activation='softmax')) #Output Layer
         model.summary()
         # f=open('/home/siddharthm/scd/scores/'+common_save+'-complete.txt','rb+')
         # print f >> model.summary()
+        data_saver("##### -------- #####")
         data_saver(str(model.to_json()))
         # f.close()
         sgd=SGD(lr=1)
@@ -222,8 +228,8 @@ def seq(x_train,y_train,x_val,y_val,x_test,y_test):
 
         #predictions=model.predict(x_val,batch_size=batch)
         #print "Shape of predictions: ", predictions.shape
-        print "Training 0 class: ",np.where(x_train==0)[0][0]
-        print "Training 1 class: ",np.where(x_train==1)[0][0]
+        print "Training 0 class: ",len(np.where(y_train[:,0]==1)[0])
+        print "Training 1 class: ",len(np.where(y_train[:,1]==1)[0])
         return classes
 
 #Non-function section
