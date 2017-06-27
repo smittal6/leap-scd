@@ -27,7 +27,7 @@ trainfile='/home/siddharthm/scd/combined/200-gamma-labels-gender-train.htk'
 #testfile='/home/siddharthm/scd/combined/gamma-labels-gender-test.htk'
 valfile='/home/siddharthm/scd/combined/200-gamma-labels-gender-val.htk'
 #Some parameters for training the model
-batch=128 #Batch size to be used while training
+batch=512 #Batch size to be used while training
 direc="/home/siddharthm/scd/scores/"
 common_save='200-gamma-dnn'
 name_val=common_save+'-val'
@@ -71,7 +71,7 @@ def load_data_train(trainfile):
         print y_train[0:5,:]
         gender_train=data[:,-1]
         del data
-        return x_train,y_train,gender_train
+        return x_train,y_train,gender_train,scaler
 def load_data_test(testfile):
         a=htk.open(testfile)
         data=a.getall()
