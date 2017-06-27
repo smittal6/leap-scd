@@ -60,6 +60,9 @@ def load_data_train(trainfile):
         train_data=a.getall()
         print "Done with Loading the training data: ",train_data.shape
         data=filter_data_train(train_data)
+        x_train=data[:,:-2]
+        scaler=StandardScaler().fit(x_train)
+        x_train=scaler.transform(x_train)
         x_train=cnn_reshaper(data[:,:-2]) #Set to different column based on different model
         Y_train=data[:,-2]
         print Y_train.shape
@@ -68,7 +71,7 @@ def load_data_train(trainfile):
         y_train=np_utils.to_categorical(Y_train,2)
         gender_train=data[:,-1]
         del data
-        return x_train,y_train,gender_train
+        return x_train,y_train,gender_train,scaler
 def load_data_test(testfile):
         a=htk.open(testfile)
         data=a.getall()
@@ -81,11 +84,13 @@ def load_data_test(testfile):
         gender_labels=data[:,-1]
         del data
         return x_test,Y_test,gender_labels
-def load_data_val(valfile):
+def load_data_val(valfile,scaler):
         a=htk.open(valfile)
         data=a.getall()
         print "Done loading the validation data: ",data.shape
         data=filter_data_val(data)
+        x_val=data[:,:-2]
+        x_val=scaler.transform(x_val)
         x_val=cnn_reshaper(data[:,:-2])
         Y_val=data[:,-2]
         # print np.where(Y_val==1)
@@ -139,8 +144,8 @@ def metrics(y_val,classes,gender_val):
 
         #We need a matrix, one of correctly classified changes, and the other of incorrectly classified changes.
         for i in range(len(y_val)):
-                id1=int(gender_val[i][0])
-                id2=int(gender_val[i][1])
+                id1=int(str(gender_val[i])[0])
+                id2=int(str(gender_val[i])[1])
                 if y_test[i]==1:
                         if classes[i]==1:
                                 cd_correct_matrix[id1-1,id2-1]+=1
@@ -162,11 +167,11 @@ def metrics(y_val,classes,gender_val):
         ### ------------- ###
 
 #Non-function section
-x_train,y_train,gender_train=load_data_train(trainfile)
+x_train,y_train,gender_train,scaler=load_data_train(trainfile)
 print "Loading training data complete"
 #x_test,y_test,gender_labels=load_data_test(testfile)
 #print "Loading testing data complete"
-x_val,y_val,gender_val=load_data_val(valfile)
+x_val,y_val,gender_val=load_data_val(valfile,scaler)
 # print np.where(y_val[:,1]==1)
 print "Loading validation data complete"
 ## SHAPE TESTS ###
@@ -180,17 +185,20 @@ def seq(x_train,y_train,x_val,y_val,x_test,y_test):
         #Defining the structure of the neural network
         #Creating a Network, with 2 Convolutional layers
         model=Sequential()
-        model.add(Conv2D(128,(2,5),activation='relu',input_shape=(1,64,20)))
-        model.add(Conv2D(128,(2,3)))
-        model.add(Conv2D(64,(2,3)))
-        model.add(MaxPooling2D((2,2)))
+        model.add(Conv2D(128,(5,3),activation='relu',input_shape=(1,64,20)))
+        model.add(Conv2D(128,(5,3),activation='relu',padding='same'))
+        model.add(Conv2D(64,(3,3),activation='relu'))
+        model.add(MaxPooling2D((5,2)))
         model.add(Flatten())
-        model.add(Dense(512,activation='relu')) #Fully connected layer 1
+        model.add(Dense(256,activation='relu')) #Fully connected layer 1
+        model.add(Dropout(0.5))
+        model.add(Dense(256,activation='relu')) #Fully connected layer 1
         model.add(Dropout(0.5))
         model.add(Dense(2,activation='softmax')) #Output Layer
         model.summary()
         # f=open('/home/siddharthm/scd/scores/'+common_save+'-complete.txt','rb+')
         # print f >> model.summary()
+        data_saver("##### ------ #####")
         data_saver(str(model.to_json()))
         # f.close()
         #Compilation region: Define optimizer, cost function, and the metric?
