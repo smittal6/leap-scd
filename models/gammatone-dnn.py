@@ -222,7 +222,8 @@ def seq(x_train,y_train,x_val,y_val,x_test,y_test):
 
         #predictions=model.predict(x_val,batch_size=batch)
         #print "Shape of predictions: ", predictions.shape
-        #print "Shape of y_test: ",y_test.shape
+        print "Training 0 class: ",np.where(x_train==0)[0][0]
+        print "Training 1 class: ",np.where(x_train==1)[0][0]
         return classes
 
 #Non-function section
