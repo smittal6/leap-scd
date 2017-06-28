@@ -14,6 +14,7 @@ keep_true=1
 
 def return_vec(x,id1,id2):
         vector=np.zeros((len(x),1))
+        print "The label vector: ",x
         first_index=np.where(x==1)[0][0] #Storing the part from where speaker change and subsequently second speaker starts
         for i in range(len(x)):
                 if x[i]==1:
@@ -30,8 +31,8 @@ def return_vec(x,id1,id2):
                 print "Something is wrong in the return_vec function"
 
 def filter_data(x):
-        type1=x[x[:,-1]==0]
-        type2=x[x[:,-1]==1]
+        type1=x[x[:,-2]==0]
+        type2=x[x[:,-2]==1]
         keep=int(percentage_to_keep*type1.shape[0])
         keep2=int(keep_true*type2.shape[0])
         # print "0 keeps: ",keep," 1 keeps: ",keep2
@@ -72,22 +73,23 @@ def data_creator(num,addr,file_reader,filename):
                 ### GAMMATONE -- LABEL   <--- Structure of the final matrix
                 try:
                         read_data=data_read.getall()
-                        # print "Raw shape: ",read_data.shape
-                        read_data=filter_data(read_data)
-                        # print "Filtered data shape: ",read_data.shape
-                        scdlab+=len(np.where(read_data[:,-1]==1)[0])
-                        noscdlab+=read_data.shape[0]-len(np.where(read_data[:,-1]==1)[0])
-                        #id1 and id2 are integers essentially. if male then 2, if female than 1
                         id1=(1,2)[(file_reader[i][0]=='M')==True]
                         temp_index=file_reader[i].index("-")
                         id2=(1,2)[(file_reader[i][temp_index+1]=='M')==True]
                         print "ID1: ",id1," ID2: ",id2
                         gender_label=return_vec(read_data[:,-1],id1,id2)
+                        read_data=np.hstack((read_data,gender_label))
+                        # print "Raw shape: ",read_data.shape
+                        read_data=filter_data(read_data) #We lose the structure of the file because of shuffling
+                        # print "Filtered data shape: ",read_data.shape
+                        scdlab+=len(np.where(read_data[:,-1]==1)[0])
+                        noscdlab+=read_data.shape[0]-len(np.where(read_data[:,-1]==1)[0])
+                        #id1 and id2 are integers essentially. if male then 2, if female than 1
                         # kurt_vector=np.transpose(kurt_matrix)
                         # sfm_vector=np.transpose(sfm_matrix)
                         # label_vector=np.transpose(labels_this_file)
                         # final_vector=np.hstack((read_data,kurt_vector,sfm_vector,label_vector))
-                        final_vector=np.hstack((read_data,gender_label))
+                        final_vector=read_data
                         # matrix=np.vstack((matrix,final_vector))
                         del read_data
                 except:
@@ -99,13 +101,13 @@ def data_creator(num,addr,file_reader,filename):
                 writer.writeall(final_vector)
         print('corrput_files',corrupt_files)
         f=open(save_extra,'w')
-        write_string=str(scdlab)+","+str(noscdlab)
+        write_string=str(scdlab)+","+str(noscdlab)+", Corrupt: "+str(corrupt_files)
         f.write(write_string)
         f.close()
 
 # First sys input is whether test/, train/ or val/ and second input is trainfile.list or ...., third is train, test or val
 addr='/home/siddharthm/scd/context/200/mfcc-only/'+str(sys.argv[1])#address of the HTK files stored somewhere
-cwd='/home/siddharthm/scd/combined' #The directory where we will change the address of 
+cwd='/home/siddharthm/scd/combined/mfcc-only' #The directory where we will change the address of 
 # kurt_addr='/home/siddharthm/scd/feats/kurt/'+str(sys.argv[1])
 # sfm_addr='/home/siddharthm/scd/feats/sfm/'+str(sys.argv[1])
 # label_addr='/home/siddharthm/scd/vad/'+str(sys.argv[1])

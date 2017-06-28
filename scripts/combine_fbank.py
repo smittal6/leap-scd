@@ -69,19 +69,20 @@ def data_creator(num,addr,file_reader,filename):
                 ### GAMMATONE -- LABEL --GenderLabel  <--- Structure of the final matrix
                 try:
                         read_data=data_read.getall()
-                        read_data=filter_data(read_data)
-                        scdlab+=len(np.where(read_data[:,-1]==1)[0])
-                        noscdlab+=read_data.shape[0]-len(np.where(read_data[:,-1]==1)[0])
-                        #id1 and id2 are integers essentially. if male then 1, if female than 0
                         id1=(1,2)[(file_reader[i][0]=='M')==True]
                         temp_index=file_reader[i].index("-")
                         id2=(1,2)[(file_reader[i][temp_index+1]=='M')==True]
                         gender_label=return_vec(read_data[:,-1],id1,id2)
+                        read_data=np.hstack((read_data,gender_label))
+                        read_data=filter_data(read_data)
+                        scdlab+=len(np.where(read_data[:,-1]==1)[0])
+                        noscdlab+=read_data.shape[0]-len(np.where(read_data[:,-1]==1)[0])
+                        #id1 and id2 are integers essentially. if male then 1, if female than 0
                         # kurt_vector=np.transpose(kurt_matrix)
                         # sfm_vector=np.transpose(sfm_matrix)
                         # label_vector=np.transpose(labels_this_file)
                         # final_vector=np.hstack((read_data,kurt_vector,sfm_vector,label_vector))
-                        final_vector=np.hstack((read_data,gender_label))
+                        final_vector=read_data
                         # matrix=np.vstack((matrix,final_vector))
                         del read_data
                 except:
@@ -93,13 +94,13 @@ def data_creator(num,addr,file_reader,filename):
                 writer.writeall(final_vector)
         print('corrput_files',corrupt_files)
         f=open(save_extra,'w')
-        write_string=str(scdlab)+","+str(noscdlab)
+        write_string=str(scdlab)+","+str(noscdlab)+", Corrupt: "+str(corrupt_files)
         f.write(write_string)
         f.close()
 
 # First sys input is whether test/, train/ or val/ and second input is trainfile.list or ...., third is train, test or val
 addr='/home/siddharthm/scd/context/200/fbank/'+str(sys.argv[1])#address of the HTK files stored somewhere
-cwd='/home/siddharthm/scd/combined' #The directory where we will change the address of 
+cwd='/home/siddharthm/scd/combined/fbank' #The directory where we will change the address of 
 # kurt_addr='/home/siddharthm/scd/feats/kurt/'+str(sys.argv[1])
 # sfm_addr='/home/siddharthm/scd/feats/sfm/'+str(sys.argv[1])
 # label_addr='/home/siddharthm/scd/vad/'+str(sys.argv[1])
