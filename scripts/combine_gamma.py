@@ -9,7 +9,7 @@ import htkmfc as htk
 # If female then mark her as 0 and if male then mark as 1
 # Now for any kind of combination, we take both the ids and concatenate them, and store as int
 
-percentage_to_keep=0.2
+percentage_to_keep=0.1
 keep_true=1
 
 def return_vec(x,id1,id2):
@@ -17,14 +17,14 @@ def return_vec(x,id1,id2):
         first_index=np.where(x==1)[0][0] #Storing the part from where speaker change and subsequently second speaker starts
         for i in range(len(x)):
                 if x[i]==1:
-                        vector[i]=int(str(id1)+str(id2))
+                        vector[i,0]=int(str(id1)+str(id2))
                 if x[i]==0:
                         if i<first_index:
-                                vector[i]=int(str(id1)+str(id1))
+                                vector[i,0]=id1
                         else:
-                                vector[i]=int(str(id2)+str(id2))
+                                vector[i,0]=id2
         if len(vector)==len(x):
-                print vector
+                # print vector
                 return vector
         else:
                 print "Something is wrong in the return_vec function"
@@ -104,7 +104,7 @@ cwd='/home/siddharthm/scd/combined' #The directory where we will change the addr
 # sfm_addr='/home/siddharthm/scd/feats/sfm/'+str(sys.argv[1])
 # label_addr='/home/siddharthm/scd/vad/'+str(sys.argv[1])
 num=20*64+1+1 #The length of the feature vector, to be read and stored in the htk format[Right now,20*64 Gammatone+1 Label+1 gender]
-file_read='/hare/rajathk/neerajs/scd/lists/'+str(sys.argv[2]) #The raw filenames, in the form of list
+file_read='/home/siddharthm/scd/lists/'+str(sys.argv[2]) #The raw filenames, in the form of list
 filename='200-gamma-labels-gender-'+str(sys.argv[3]) #The name of the file where stuff is going to be stored
 save_extra='200-gamma-extra-'+str(sys.argv[3])+'.txt' #For saving the count of lables
 file_reader=file_opener(file_read) #Calling the function to read the list of files
