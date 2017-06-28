@@ -18,7 +18,7 @@ phndir='/home/siddharthm/TIMIT/phones/'
 choices=[clean,rev,rev_noise,rev_inaud]
 #### ------------- ####
 
-wavesavdir='/home/siddharthm/scd/wav/train/' #Save the generated wave file in this dir
+wavesavdir='/home/siddharthm/' #Save the generated wave file in this dir
 over_addr='/home/siddharthm/scd/vad/train/' #labels in the directory
 common_save='train_combinations'
 ### SOME VARIABLE DEFINITIONS ###
@@ -42,7 +42,7 @@ def data_saver(data):
 def gen_func(file1,file2,input_index):
         print('Begin')
         print(file1,file2,input_index)
-        data_saver(str(file1)+str(file2))
+        data_saver(str(file1)+","+str(file2))
         ind1=file1.index('_')+1
         ind2=file2.index('_')+1
         file1_mod=file1[0:ind1]+file1[ind1+1:]
@@ -143,8 +143,7 @@ def gen_func(file1,file2,input_index):
         out=np.hstack((a2[0,:160*(lastindex+1)],silence_actual_wav,b2[0,-samplestart:-1])) #Actually creating the numpy array which has the overlap and single speaker speech segments
         # print "Out wav file: ", out.shape
         flabels=[]
-        count=0
-        flag=0
+        count,flag,count_TWO=0,0,0
         # 2 for the silence class, 1 for speaker change frame, 0 for no speaker change frame
         while end<len(labelFrames):
                 #Getting the vector ready
@@ -155,28 +154,32 @@ def gen_func(file1,file2,input_index):
                 count_one=len(np.where( aconsider == 1 )[0])
                 count_two=len(np.where( aconsider == 2 )[0])
                 #Decision section
+                dec=-1
                 if count_zero*160>int(ratio_sil*decision_samples):
                         dec=2
+                        count_TWO+=1
                 elif min(count_one,count_two)*160>int(ratio_sc*decision_samples):
                         dec=1
+                        count+=1
                 else:
                         dec=0
+                        flag+=1
                 #Update section
                 # print "Decision Taken: ",dec
                 # print count_zero,count_one,count_two,dec
-                if dec==2:
-                        count_two+=1
-                if dec==1:
-                        count+=1
-                else:
-                        flag+=1
+                # if dec==2:
+                        # count_two+=1
+                # elif dec==1:
+                        # count+=1
+                # else:
+                        # flag+=1
                 flabels.append(dec)
                 # print "Flag: ", flag,"Count: ",count
                 iterator+=1
                 start+=1
                 end=skip_entries+start
 
-        print count,flag,count_two
+        # print count,flag,count_TWO
         # print iterator
         ### Setting the labels and the output ###
         out=out.astype(np.int16)
@@ -189,7 +192,8 @@ def gen_func(file1,file2,input_index):
         flabels=np.reshape(flabels,(1,flabels.shape[0]))
         # print flabels.shape
         ### SAVING THE STUFF SECTION ###
-        scipy.io.wavfile.write(wavesavdir+file1+'-'+file2+'-'+str(input_index)+'.wav',a1,out)
+        print "Labels: ",flabels
+        # scipy.io.wavfile.write(wavesavdir+file1+'-'+file2+'-'+str(input_index)+'.wav',a1,out)
         writer=htk.open(over_addr+file1+'-'+file2+'-'+str(input_index)+'.htk',mode='w',veclen=max(flabels.shape))
         writer.writeall(flabels)
         ### --------- ###

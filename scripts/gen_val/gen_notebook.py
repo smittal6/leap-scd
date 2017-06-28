@@ -164,12 +164,12 @@ def gen_func(file1,file2,input_index):
                 #Update section
                 # print "Decision Taken: ",dec
                 # print count_zero,count_one,count_two,dec
-                if dec==2:
-                        count_two+=1
-                if dec==1:
-                        count+=1
-                else:
-                        flag+=1
+                # if dec==2:
+                        # count_two+=1
+                # if dec==1:
+                        # count+=1
+                # else:
+                        # flag+=1
                 flabels.append(dec)
                 # print "Flag: ", flag,"Count: ",count
                 iterator+=1
@@ -189,7 +189,7 @@ def gen_func(file1,file2,input_index):
         flabels=np.reshape(flabels,(1,flabels.shape[0]))
         # print flabels.shape
         ### SAVING THE STUFF SECTION ###
-        scipy.io.wavfile.write(wavesavdir+file1+'-'+file2+'-'+str(input_index)+'.wav',a1,out)
+        # scipy.io.wavfile.write(wavesavdir+file1+'-'+file2+'-'+str(input_index)+'.wav',a1,out)
         writer=htk.open(over_addr+file1+'-'+file2+'-'+str(input_index)+'.htk',mode='w',veclen=max(flabels.shape))
         writer.writeall(flabels)
         ### --------- ###

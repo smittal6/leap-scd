@@ -2,15 +2,25 @@ import re
 import numpy as np
 import gen_notebook as gen
 
-f=open('/home/siddharthm/TIMIT_DATAPREP/test_files.list')
+f=open('/home/siddharthm/scd/vad/testfile1.list')
 f=f.read()
 f=f.strip()
 f=re.split('\n',f)
 
-for i in range(20000):
-        [index1,index2]=np.random.choice(1040,size=2,replace=False)
-        file1=f[index1]
-        file2=f[index2]
-        gen.gen_func(file1,file2,i)
+f_1=open('/home/siddharthm/scd/vad/testfile2.list')
+f_1=f_1.read()
+f_1=f_1.strip()
+f_1=re.split('\n',f_1)
+
+f_2=open('/home/siddharthm/scd/vad/testnumbers.list')
+f_2=f_2.read()
+f_2=f_2.strip()
+f_2=re.split('\n',f_2)
+
+for i in range(len(f)):
+        # [index1,index2]=np.random.choice(3200,size=2,replace=False)
+        file1=f[i]
+        file2=f_1[i]
+        gen.gen_func(file1,file2,int(f_2[i]))
         print "Completed Generating",  i+1
 
