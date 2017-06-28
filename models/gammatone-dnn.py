@@ -62,7 +62,7 @@ def load_data_train(trainfile):
         # x_train=cnn_reshaper(data[:,:-2]) #Set to different column based on different model
         x_train=data[:,:-2] #Set to different column based on different model
         scaler=StandardScaler().fit(x_train)
-        x_train=scaler.transform(x_train)
+        # x_train=scaler.transform(x_train)
         Y_train=data[:,-2]
         print Y_train.shape
         # print np.where(Y_train==2)
@@ -90,7 +90,7 @@ def load_data_val(valfile,scaler):
         print "Done loading the validation data: ",data.shape
         data=filter_data_val(data)
         x_val=data[:,:-2]
-        x_val=scaler.transform(x_val)
+        # x_val=scaler.transform(x_val)
         Y_val=data[:,-2]
         # print np.where(Y_val==1)
         Y_val=np.reshape(Y_val,(Y_val.shape[0],1))
@@ -143,14 +143,14 @@ def metrics(y_val,classes,gender_val):
 
         #We need a matrix, one of correctly classified changes, and the other of incorrectly classified changes.
         for i in range(len(y_val)):
-                id1=int(gender_val[i][0])-1
-                id2=int(gender_val[i][1])-1
-                if y_test[i]==1:
+                id1=int(str(gender_val[i])[0])-1
+                id2=int(str(gender_val[i])[1])-1
+                if y_val[i,1]==1:
                         if classes[i]==1:
                                 cd_correct_matrix[id1][id2]+=1
                         else:
                                 cd_incorrect_matrix[id1][id2]+=1
-                else:
+                elif y_val[i,0]==1:
                         if classes[i]==0:
                                 single_correct_matrix[id1][id2]+=1
                         else:
