@@ -30,8 +30,8 @@ def return_vec(x,id1,id2):
                 print "Something is wrong in the return_vec function"
 
 def filter_data(x):
-        type1=x[x[:,-1]==0]
-        type2=x[x[:,-1]==1]
+        type1=x[x[:,-2]==0]
+        type2=x[x[:,-2]==1]
         keep=int(percentage_to_keep*type1.shape[0])
         keep2=int(keep_true*type2.shape[0])
         np.random.shuffle(type2)
@@ -82,12 +82,12 @@ def data_creator(num,addr,file_reader,filename):
                         # sfm_vector=np.transpose(sfm_matrix)
                         # label_vector=np.transpose(labels_this_file)
                         # final_vector=np.hstack((read_data,kurt_vector,sfm_vector,label_vector))
-                        final_vector=np.hstack((read_data,gender_label))
+                        final_vector=read_data
                         # matrix=np.vstack((matrix,final_vector))
                         del read_data
                 except:
-                        print "In the corrupt file section"
                         corrupt_files+=1
+                        print "In the corrupt file section",corrupt_files
                         continue
                         # ind=ind+read_data.shape[0]
                 #HTK supports concatenation, so we don't have to deal with numpy matrix again and again

@@ -14,7 +14,7 @@ keep_true=1
 
 def return_vec(x,id1,id2):
         vector=np.zeros((len(x),1))
-        print "The label vector: ",x
+        # print "The label vector: ",x
         first_index=np.where(x==1)[0][0] #Storing the part from where speaker change and subsequently second speaker starts
         for i in range(len(x)):
                 if x[i]==1:

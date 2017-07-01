@@ -85,12 +85,12 @@ def data_creator(num,addr,file_reader,filename):
                         # matrix=np.vstack((matrix,final_vector))
                         del read_data
                 except:
+                        corrupt_files+=1
                         print "In the corrupt file section",corrupt_files
                         # f1=open('corrupt.txt','w')
                         # write_s=str(file_reader[i])
                         # f1.write(write_s)
                         # f1.close()
-                        corrupt_files+=1
                         continue
                         # ind=ind+read_data.shape[0]
                 #HTK supports concatenation, so we don't have to deal with numpy matrix again and again

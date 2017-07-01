@@ -1,17 +1,17 @@
 clear all; clc;
-poolsize = 4;
+poolsize = 8;
 parpool(poolsize);
 %Par parameters are for parallel processing of the files
 % ----- update the path to respective directories
-label_addr = '/home/user/work/scd/vad/test/';
+label_addr = '/home/siddharthm/scd/vad/test/';
 %mfcc_feats_addr = '/home/neerajs/work/NEW_REGIME/SID/FEATS/mfcc_after/train/';
 %kurt_feats_addr = '/home/neerajs/work/NEW_REGIME/SID/FEATS/kurt_after/val/';
 %sfm_feats_addr = '/home/neerajs/work/NEW_REGIME/SID/FEATS/sfm_after/val/';mel_feats_addr = '/home/neerajs/work/NEW_REGIME/SID/FEATS/mel_after/train_4Khz/';
 %linear_feats_addr='/home/neerajs/work/NEW_REGIME/SID/FEATS/linear_after/train/';
-EXTRA='/home/user/work/scd/feats/mfcc/test/';
-context_addr = '/home/user/work/scd/context/200/mfcc/';
+EXTRA='/home/siddharthm/scd/feats/mfcc/test/';
+context_addr = '/home/siddharthm/scd/context/200/mfcc-only/';
 % ----- list of files
-f=fopen('/home/user/work/scd/lists/rawtestfiles.list');
+f=fopen('/home/siddharthm/scd/lists/rawtestfiles.list');
 f=textscan(f,'%s');
 len=cellfun('length',f)
 type = 'EXTRA';
@@ -48,6 +48,7 @@ switch(type)
         case 'EXTRA'
                 [data_extra,a,b,c,d]=readhtk([EXTRA f{1}{i} '.htk']);
                 data=data_extra';
+                data=data(1:13,:)
                 op_path='test';
 end
 
@@ -65,7 +66,7 @@ f{1}{i}
 nframes = size(data,2);
 %data_write = zeros(nframes,(2*context_size+1)*size(data,1));
 
-temp_matrix=zeros(39,20);
+temp_matrix=zeros(13,20);
 final_matrix=zeros(size(data,2)-20+1,20*size(data,1)+1); % The dimensions of the final matrix to be saved
 % The rows are essentially the number of frames we can construct, which is given by number-shift+1
 start=1;
