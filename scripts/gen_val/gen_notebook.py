@@ -18,15 +18,15 @@ phndir='/home/siddharthm/TIMIT/phones/'
 choices=[clean,rev,rev_noise,rev_inaud]
 #### ------------- ####
 
-wavesavdir='/home/siddharthm/scd/wav/val/' #Save the generated wave file in this dir
-over_addr='/home/siddharthm/scd/vad/val/' #labels in the directory
+wavesavdir='/home/siddharthm/scd/wavnew/val/' #Save the generated wave file in this dir
+over_addr='/home/siddharthm/scd/vad/10/val/' #labels in the directory
 common_save='val_combinations'
 ### SOME VARIABLE DEFINITIONS ###
-ratio_sc=0.20
+ratio_sc=0.10
 ratio_sil=0.70
-time_decision=200 #in milliseconds
+time_decision=600 #in milliseconds
 decision_samples=time_decision*16 #Assuming 16KHz sampling rate
-silence_samples=0.10*decision_samples #The number of samples to be inserted[as silence]
+silence_samples=0.00*decision_samples #The number of samples to be inserted[as silence]
 ###
 
 # We are constructing ground truth from Phone files.
@@ -176,20 +176,20 @@ def gen_func(file1,file2,input_index):
                 start+=1
                 end=skip_entries+start
 
-        print count,flag,count_two
+        # print count,flag,count_two
         # print iterator
         ### Setting the labels and the output ###
         out=out.astype(np.int16)
         out=np.reshape(out,(out.shape[0],1)) #Reshaping it to form the vector which is required to be written in wav file
 
         # print "The shape of out vector: ",out.shape
-        flabels=np.array(flabels)
+        flabels=np.array(labelFrames)
         # print flabels.shape
         # print type(flabels)
         flabels=np.reshape(flabels,(1,flabels.shape[0]))
         # print flabels.shape
         ### SAVING THE STUFF SECTION ###
-        # scipy.io.wavfile.write(wavesavdir+file1+'-'+file2+'-'+str(input_index)+'.wav',a1,out)
+        scipy.io.wavfile.write(wavesavdir+file1+'-'+file2+'-'+str(input_index)+'.wav',a1,out)
         writer=htk.open(over_addr+file1+'-'+file2+'-'+str(input_index)+'.htk',mode='w',veclen=max(flabels.shape))
         writer.writeall(flabels)
         ### --------- ###

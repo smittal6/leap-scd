@@ -17,7 +17,7 @@ f_2=f_2.read()
 f_2=f_2.strip()
 f_2=re.split('\n',f_2)
 
-for i in range(len(f)):
+for i in range(len(f)-10000):
         # [index1,index2]=np.random.choice(3200,size=2,replace=False)
         file1=f[i]
         file2=f_1[i]

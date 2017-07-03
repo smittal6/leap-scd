@@ -18,15 +18,15 @@ phndir='/home/siddharthm/TIMIT/phones/'
 choices=[clean,rev,rev_noise,rev_inaud]
 #### ------------- ####
 
-wavesavdir='/home/siddharthm/' #Save the generated wave file in this dir
-over_addr='/home/siddharthm/scd/vad/train/' #labels in the directory
+wavesavdir='/home/siddharthm/scd/wavnew/train/' #Save the generated wave file in this dir
+over_addr='/home/siddharthm/scd/vad/10/train/' #labels in the directory
 common_save='train_combinations'
 ### SOME VARIABLE DEFINITIONS ###
-ratio_sc=0.20
+ratio_sc=0.10
 ratio_sil=0.70
-time_decision=200 #in milliseconds
+time_decision=600 #in milliseconds
 decision_samples=time_decision*16 #Assuming 16KHz sampling rate
-silence_samples=0.10*decision_samples #The number of samples to be inserted[as silence]
+silence_samples=0.00*decision_samples #The number of samples to be inserted[as silence]
 ###
 
 # We are constructing ground truth from Phone files.
@@ -131,6 +131,7 @@ def gen_func(file1,file2,input_index):
         labelpart2=np.hstack((labelFrames2[firstindex:])) #silence part was not extraneous, was coming twice
         labelFrames = np.hstack((labelpart1,labelpart2))
         # print "Length of the labelFRames vector: ",labelFrames.shape
+        print labelFrames
         start=0
         iterator=0
         skip_entries=int(decision_samples/160)
@@ -166,6 +167,7 @@ def gen_func(file1,file2,input_index):
                         flag+=1
                 #Update section
                 # print "Decision Taken: ",dec
+                # print "\n"
                 # print count_zero,count_one,count_two,dec
                 # if dec==2:
                         # count_two+=1
@@ -186,14 +188,13 @@ def gen_func(file1,file2,input_index):
         out=np.reshape(out,(out.shape[0],1)) #Reshaping it to form the vector which is required to be written in wav file
 
         # print "The shape of out vector: ",out.shape
-        flabels=np.array(flabels)
+        flabels=np.array(labelFrames)
         # print flabels.shape
         # print type(flabels)
         flabels=np.reshape(flabels,(1,flabels.shape[0]))
-        # print flabels.shape
         ### SAVING THE STUFF SECTION ###
-        print "Labels: ",flabels
-        # scipy.io.wavfile.write(wavesavdir+file1+'-'+file2+'-'+str(input_index)+'.wav',a1,out)
+        # print "Labels: ",flabels
+        scipy.io.wavfile.write(wavesavdir+file1+'-'+file2+'-'+str(input_index)+'.wav',a1,out)
         writer=htk.open(over_addr+file1+'-'+file2+'-'+str(input_index)+'.htk',mode='w',veclen=max(flabels.shape))
         writer.writeall(flabels)
         ### --------- ###
@@ -201,7 +202,7 @@ def gen_func(file1,file2,input_index):
 
 
 ### TRY CALLS[Actual use with wrapper] ###
-# gen_func('MPGR0_I1410','MTPF0_I1865',1)
+# gen_func('FCJF0_SX397','MJMM0_SX445',15775)
 # gen_func('FTBW0_X85','FTLG0_I1743',2)
 ### ------- ###
 
