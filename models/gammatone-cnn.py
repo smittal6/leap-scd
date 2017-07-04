@@ -24,34 +24,34 @@ import os
 
 np.random.seed(1337)
 EPOCH=30 #Number of iterations to be run on the model while training
-trainfile='/home/siddharthm/scd/combined/200-gamma-labels-gender-train.htk'
+trainfile='/home/siddharthm/scd/combined/gamma/600-gamma-labels-gender-train.htk'
 #testfile='/home/siddharthm/scd/combined/gamma-labels-gender-test.htk'
-valfile='/home/siddharthm/scd/combined/200-gamma-labels-gender-val.htk'
+valfile='/home/siddharthm/scd/combined/gamma/600-gamma-labels-gender-val.htk'
 #Some parameters for training the model
-batch=512 #Batch size to be used while training
+batch=128 #Batch size to be used while training
 direc="/home/siddharthm/scd/scores/"
-common_save='200-gamma-cnn'
+common_save='600-gamma-cnn'
 name_val=common_save+'-val'
 #name_test=common_save+'-test'
 
 def filter_data_train(x):
-        stack1=x[x[:,-2]==0]
-        stack1=stack1[0:int(0.16*x.shape[0])]
-        stack2=x[x[:,-2]==1]
+        stack1=x[x[:,-2]==1]
+        stack1=stack1[0:int(0.5*x.shape[0])]
+        stack2=x[x[:,-2]==0]
         mat=np.vstack((stack1,stack2))
         np.random.shuffle(mat)
         return mat
 def filter_data_val(x):
-        stack1=x[x[:,-2]==0]
-        stack1=stack1[0:int(0.14*x.shape[0])]
-        stack2=x[x[:,-2]==1]
+        stack1=x[x[:,-2]==1]
+        stack1=stack1[0:int(0.5*x.shape[0])]
+        stack2=x[x[:,-2]==0]
         mat=np.vstack((stack1,stack2))
         np.random.shuffle(mat)
         return mat
 #Now the data has the format that last column has the label, and the rest of stuff needs to be reshaped.
 #The format for reshaping is as follows: Rows = Number of filters X Context size(40 in this case)
 def cnn_reshaper(Data):
-        dat=np.reshape(Data,(Data.shape[0],1,64,20)) #The format is: Number of samples, Channels, Rows, Columns
+        dat=np.reshape(Data,(Data.shape[0],1,64,61)) #The format is: Number of samples, Channels, Rows, Columns
         return dat
 
 def load_data_train(trainfile):
@@ -143,27 +143,27 @@ def metrics(y_val,classes,gender_val):
         #print np.where(classes==1) #classes must be one dimensional vector here
 
         #We need a matrix, one of correctly classified changes, and the other of incorrectly classified changes.
-        for i in range(len(y_val)):
-                id1=int(str(gender_val[i])[0])
-                id2=int(str(gender_val[i])[1])
-                if y_val[i,1]==1:
-                        if classes[i]==1:
-                                cd_correct_matrix[id1-1,id2-1]+=1
-                        else:
-                                cd_incorrect_matrix[id1-1,id2-1]+=1
-                elif y_val[i,0]==1:
-                        if classes[i]==0:
-                                single_correct_matrix[id1-1,id2-1]+=1
-                        else:
-                                single_incorrect_matrix[id1-1,id2-1]+=1
-        data_saver('Speaker changes Correct detected')
-        data_saver(cd_correct_matrix)
-        data_saver('Speaker changes wrongly classified')
-        data_saver(cd_incorrect_matrix)
-        data_saver('Single speaker frames correct')
-        data_saver(single_correct_matrix)
-        data_saver('Single speaker frames wrongly classified')
-        data_saver(single_incorrect_matrix)
+        # for i in range(len(y_val)):
+                # id1=int(str(gender_val[i])[0])
+                # id2=int(str(gender_val[i])[1])
+                # if y_val[i,1]==1:
+                        # if classes[i]==1:
+                                # cd_correct_matrix[id1-1,id2-1]+=1
+                        # else:
+                                # cd_incorrect_matrix[id1-1,id2-1]+=1
+                # elif y_val[i,0]==1:
+                        # if classes[i]==0:
+                                # single_correct_matrix[id1-1,id2-1]+=1
+                        # else:
+                                # single_incorrect_matrix[id1-1,id2-1]+=1
+        # data_saver('Speaker changes Correct detected')
+        # data_saver(cd_correct_matrix)
+        # data_saver('Speaker changes wrongly classified')
+        # data_saver(cd_incorrect_matrix)
+        # data_saver('Single speaker frames correct')
+        # data_saver(single_correct_matrix)
+        # data_saver('Single speaker frames wrongly classified')
+        # data_saver(single_incorrect_matrix)
         ### ------------- ###
 
 #Non-function section
@@ -185,14 +185,14 @@ def seq(x_train,y_train,x_val,y_val,x_test,y_test):
         #Defining the structure of the neural network
         #Creating a Network, with 2 Convolutional layers
         model=Sequential()
-        model.add(Conv2D(128,(5,3),activation='relu',input_shape=(1,64,20)))
-        model.add(Conv2D(128,(5,3),activation='relu',padding='same'))
-        model.add(Conv2D(64,(3,3),activation='relu'))
-        model.add(MaxPooling2D((5,2)))
+        model.add(Conv2D(64,(6,3),activation='relu',input_shape=(1,64,61)))
+        model.add(Conv2D(128,(6,3),activation='relu',padding='same'))
+        model.add(Conv2D(256,(3,3),activation='relu'))
+        # model.add(MaxPooling2D((5,2)))
         model.add(Flatten())
-        model.add(Dense(256,activation='relu')) #Fully connected layer 1
-        model.add(Dropout(0.5))
-        model.add(Dense(256,activation='relu')) #Fully connected layer 1
+        model.add(Dense(512,activation='relu')) #Fully connected layer 1
+        # model.add(Dropout(0.5))
+        model.add(Dense(1024,activation='relu')) #Fully connected layer 1
         model.add(Dropout(0.5))
         model.add(Dense(2,activation='softmax')) #Output Layer
         model.summary()
@@ -203,8 +203,8 @@ def seq(x_train,y_train,x_val,y_val,x_test,y_test):
         # f.close()
         #Compilation region: Define optimizer, cost function, and the metric?
         sgd=SGD(lr=1)
-        early_stopping=EarlyStopping(monitor='val_loss',patience=4)
-        reduce_lr=ReduceLROnPlateau(monitor='val_loss',patience=4,factor=0.5)
+        early_stopping=EarlyStopping(monitor='val_loss',patience=6)
+        reduce_lr=ReduceLROnPlateau(monitor='val_loss',patience=4,factor=0.5,min_lr=0.0000001)
         model.compile(optimizer=sgd,loss='categorical_crossentropy',metrics=['accuracy'])
 
         #Fitting region:Get to fit the model, with training data
@@ -229,7 +229,8 @@ def seq(x_train,y_train,x_val,y_val,x_test,y_test):
 
         #predictions=model.predict(x_val,batch_size=batch)
         #print "Shape of predictions: ", predictions.shape
-        #print "Shape of y_test: ",y_test.shape
+        print "Training 0 class: ",len(np.where(y_train[:,0]==1)[0])
+        print "Training 0 class: ",len(np.where(y_train[:,1]==1)[0])
         return classes
 
 #Non-function section
