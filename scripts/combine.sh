@@ -12,10 +12,15 @@
 
 #The combine_gamma program takes as input 3 arguments
 
+#### SECTION for combining fbank features
+#python combine_fbank.py train/ rawtrainfiles.list train &
+#python combine_fbank.py test/ rawtestfiles.list test &
+#python combine_fbank.py val/ rawvalfiles.list val &
+
 #### SECTION for combining gamma features
-python combine_fbank.py train/ rawtrainfiles.list train &
-python combine_fbank.py test/ rawtestfiles.list test &
-python combine_fbank.py val/ rawvalfiles.list val &
+python combine_gamma.py train/ rawtrainfiles.list train &
+#python combine_gamma.py test/ rawtestfiles.list test &
+python combine_gamma.py val/ rawvalfiles.list val &
 
 #### SECTION for combining mfcc features
 #python combine_only_mfcc.py train/ rawtrainfiles.list train &
