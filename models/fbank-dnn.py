@@ -24,13 +24,13 @@ import os
 
 np.random.seed(1337)
 EPOCH=30 #Number of iterations to be run on the model while training
-trainfile='/home/siddharthm/scd/combined/fbank/200-fbank-labels-gender-train.htk'
+trainfile='/home/siddharthm/scd/combined/fbank/600-fbank-labels-gender-train.htk'
 #testfile='/home/siddharthm/scd/combined/gamma-labels-gender-test.htk'
-valfile='/home/siddharthm/scd/combined/fbank/200-fbank-labels-gender-val.htk'
+valfile='/home/siddharthm/scd/combined/fbank/600-fbank-labels-gender-val.htk'
 #Some parameters for training the model
-batch=512 #Batch size to be used while training
+batch=128 #Batch size to be used while training
 direc="/home/siddharthm/scd/scores/"
-common_save='200-fbank-dnn'
+common_save='600-fbank-dnn'
 name_val=common_save+'-val'
 #name_test=common_save+'-test'
 
@@ -189,11 +189,11 @@ def seq(x_train,y_train,x_val,y_val,x_test,y_test):
         # model.add(Conv2D(64,(3,5)))
         # model.add(MaxPooling2D((2,2)))
         # model.add(Flatten())
-        model.add(Dense(128,activation='relu',input_shape=(1280,)))
+        model.add(Dense(128,activation='relu',input_shape=(3904,)))
         model.add(Dense(256,activation='relu')) #Fully connected layer 1
-        model.add(Dropout(0.5))
+        model.add(Dropout(0.25))
         model.add(Dense(512,activation='relu')) #Fully connected layer 1
-        model.add(Dropout(0.5))
+        model.add(Dropout(0.25))
         model.add(Dense(2,activation='softmax')) #Output Layer
         model.summary()
         # f=open('/home/siddharthm/scd/scores/'+common_save+'-complete.txt','rb+')
@@ -203,7 +203,7 @@ def seq(x_train,y_train,x_val,y_val,x_test,y_test):
         # f.close()
         sgd=SGD(lr=1)
         early_stopping=EarlyStopping(monitor='val_loss',patience=6)
-        reduce_lr=ReduceLROnPlateau(monitor='val_loss',patience=6,factor=0.5,min_lr=0.0000001)
+        reduce_lr=ReduceLROnPlateau(monitor='val_loss',patience=4,factor=0.5,min_lr=0.0000001)
         #Compilation region: Define optimizer, cost function, and the metric?
         model.compile(optimizer=sgd,loss='binary_crossentropy',metrics=['accuracy'])
 
