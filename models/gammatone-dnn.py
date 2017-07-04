@@ -34,16 +34,16 @@ name_val=common_save+'-val'
 #name_test=common_save+'-test'
 
 def filter_data_train(x):
-        stack1=x[x[:,-2]==0]
-        stack1=stack1[0:int(0.13*x.shape[0])]
-        stack2=x[x[:,-2]==1]
+        stack1=x[x[:,-2]==1]
+        stack1=stack1[0:int(0.5*x.shape[0])]
+        stack2=x[x[:,-2]==0]
         mat=np.vstack((stack1,stack2))
         np.random.shuffle(mat)
         return mat
 def filter_data_val(x):
-        stack1=x[x[:,-2]==0]
-        stack1=stack1[0:int(0.13*x.shape[0])]
-        stack2=x[x[:,-2]==1]
+        stack1=x[x[:,-2]==1]
+        stack1=stack1[0:int(0.5*x.shape[0])]
+        stack2=x[x[:,-2]==0]
         mat=np.vstack((stack1,stack2))
         np.random.shuffle(mat)
         return mat

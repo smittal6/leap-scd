@@ -35,16 +35,16 @@ name_val=common_save+'-val'
 #name_test=common_save+'-test'
 
 def filter_data_train(x):
-        stack1=x[x[:,-2]==0]
-        stack1=stack1[0:int(0.08*x.shape[0])]
-        stack2=x[x[:,-2]==1]
+        stack1=x[x[:,-2]==1]
+        stack1=stack1[0:int(0.5*x.shape[0])]
+        stack2=x[x[:,-2]==0]
         mat=np.vstack((stack1,stack2))
         np.random.shuffle(mat)
         return mat
 def filter_data_val(x):
-        stack1=x[x[:,-2]==0]
-        stack1=stack1[0:int(0.08*x.shape[0])]
-        stack2=x[x[:,-2]==1]
+        stack1=x[x[:,-2]==1]
+        stack1=stack1[0:int(0.5*x.shape[0])]
+        stack2=x[x[:,-2]==0]
         mat=np.vstack((stack1,stack2))
         np.random.shuffle(mat)
         return mat
@@ -189,8 +189,8 @@ def seq(x_train,y_train,x_val,y_val,x_test,y_test):
         # model.add(Conv2D(64,(3,5)))
         # model.add(MaxPooling2D((2,2)))
         # model.add(Flatten())
-        model.add(Dense(128,activation='relu',input_shape=(3904,)))
-        model.add(Dense(256,activation='relu')) #Fully connected layer 1
+        model.add(Dense(256,activation='relu',input_shape=(3904,)))
+        model.add(Dense(512,activation='relu')) #Fully connected layer 1
         model.add(Dropout(0.25))
         model.add(Dense(512,activation='relu')) #Fully connected layer 1
         model.add(Dropout(0.25))
