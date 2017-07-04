@@ -21,7 +21,7 @@ import time
 import sys
 import os
 
-np.random.seed(1337)
+np.random.seed(137)
 EPOCH=30 #Number of iterations to be run on the model while training
 trainfile='/home/siddharthm/scd/combined/gamma/600-gamma-labels-gender-train.htk'
 #testfile='/home/siddharthm/scd/combined/gamma-labels-gender-test.htk'
@@ -47,11 +47,6 @@ def filter_data_val(x):
         mat=np.vstack((stack1,stack2))
         np.random.shuffle(mat)
         return mat
-#Now the data has the format that last column has the label, and the rest of stuff needs to be reshaped.
-#The format for reshaping is as follows: Rows = Number of filters X Context size(40 in this case)
-def cnn_reshaper(Data):
-        dat=np.reshape(Data,(Data.shape[0],1,64,20)) #The format is: Number of samples, Channels, Rows, Columns
-        return dat
 
 def load_data_train(trainfile):
         print "Getting the training data"
@@ -111,9 +106,9 @@ def metrics(y_val,classes,gender_val):
         #We have to modify this to include metrics to capture variations between male and female and blah-blah
         #initializing the two matrixes to be saved.
         cd_correct_matrix=np.zeros((2,2))
-        single_correct_matrix=np.zeros((2,2))
+        single_correct_matrix=np.zeros((1,2))
         cd_incorrect_matrix=np.zeros((2,2))
-        single_incorrect_matrix=np.zeros((2,2))
+        single_incorrect_matrix=np.zeros((1,2))
         # print classes.shape
         single_correct,cd_correct,single_incorrect,cd_incorrect=0,0,0,0
         print "Predicted Classes: ",np.where(classes==1)
@@ -142,27 +137,28 @@ def metrics(y_val,classes,gender_val):
         #print np.where(classes==1) #classes must be one dimensional vector here
 
         #We need a matrix, one of correctly classified changes, and the other of incorrectly classified changes.
-        # for i in range(len(y_val)):
-                # id1=int(str(gender_val[i])[0])-1
-                # id2=int(str(gender_val[i])[1])-1
-                # if y_val[i,1]==1:
-                        # if classes[i]==1:
-                                # cd_correct_matrix[id1][id2]+=1
-                        # else:
-                                # cd_incorrect_matrix[id1][id2]+=1
-                # elif y_val[i,0]==1:
-                        # if classes[i]==0:
-                                # single_correct_matrix[id1][id2]+=1
-                        # else:
-                                # single_incorrect_matrix[id1][id2]+=1
-        # data_saver('Speaker changes Correct detected')
-        # data_saver(cd_correct_matrix)
-        # data_saver('Speaker changes wrongly classified')
-        # data_saver(cd_incorrect_matrix)
-        # data_saver('Single speaker frames correct')
-        # data_saver(single_correct_matrix)
-        # data_saver('Single speaker frames wrongly classified')
-        # data_saver(single_incorrect_matrix)
+        for i in range(len(y_val)):
+                if y_val[i,1]==1:
+                        id1=int(str(gender_val[i])[0])-1
+                        id2=int(str(gender_val[i])[1])-1
+                        if classes[i]==1:
+                                cd_correct_matrix[id1,id2]+=1
+                        else:
+                                cd_incorrect_matrix[id1,id2]+=1
+                elif y_val[i,0]==1:
+                        gid=gender_val[i]-1 #1 female, 2 male.
+                        if classes[i]==0:
+                                single_correct_matrix[0,gid]+=1
+                        else:
+                                single_incorrect_matrix[0,gid]+=1
+        data_saver('Speaker changes Correct detected')
+        data_saver(cd_correct_matrix)
+        data_saver('Speaker changes wrongly classified')
+        data_saver(cd_incorrect_matrix)
+        data_saver('Single speaker frames correct')
+        data_saver(single_correct_matrix)
+        data_saver('Single speaker frames wrongly classified')
+        data_saver(single_incorrect_matrix)
         # ------------- ###
 
 #Non-function section
