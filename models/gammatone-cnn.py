@@ -23,14 +23,14 @@ import sys
 import os
 
 np.random.seed(1337)
-EPOCH=30 #Number of iterations to be run on the model while training
-trainfile='/home/siddharthm/scd/combined/gamma/600-gamma-labels-gender-train.htk'
+EPOCH=50 #Number of iterations to be run on the model while training
+trainfile='/home/siddharthm/scd/combined/gamma/800-gamma-labels-gender-train.htk'
 #testfile='/home/siddharthm/scd/combined/gamma-labels-gender-test.htk'
-valfile='/home/siddharthm/scd/combined/gamma/600-gamma-labels-gender-val.htk'
+valfile='/home/siddharthm/scd/combined/gamma/800-gamma-labels-gender-val.htk'
 #Some parameters for training the model
-batch=128 #Batch size to be used while training
+batch=256 #Batch size to be used while training
 direc="/home/siddharthm/scd/scores/"
-common_save='600-gamma-cnn'
+common_save='800-gamma-cnn'
 name_val=common_save+'-val'
 #name_test=common_save+'-test'
 
@@ -51,7 +51,7 @@ def filter_data_val(x):
 #Now the data has the format that last column has the label, and the rest of stuff needs to be reshaped.
 #The format for reshaping is as follows: Rows = Number of filters X Context size(40 in this case)
 def cnn_reshaper(Data):
-        dat=np.reshape(Data,(Data.shape[0],1,64,61)) #The format is: Number of samples, Channels, Rows, Columns
+        dat=np.reshape(Data,(Data.shape[0],1,64,81)) #The format is: Number of samples, Channels, Rows, Columns
         return dat
 
 def load_data_train(trainfile):
@@ -185,13 +185,13 @@ def seq(x_train,y_train,x_val,y_val,x_test,y_test):
         #Defining the structure of the neural network
         #Creating a Network, with 2 Convolutional layers
         model=Sequential()
-        model.add(Conv2D(64,(6,3),activation='relu',input_shape=(1,64,61)))
+        model.add(Conv2D(64,(6,3),activation='relu',input_shape=(1,64,81)))
         model.add(Conv2D(128,(6,3),activation='relu',padding='same'))
         model.add(Conv2D(256,(3,3),activation='relu'))
-        # model.add(MaxPooling2D((5,2)))
+        model.add(MaxPooling2D((2,3)))
         model.add(Flatten())
         model.add(Dense(512,activation='relu')) #Fully connected layer 1
-        # model.add(Dropout(0.5))
+        model.add(Dropout(0.25))
         model.add(Dense(1024,activation='relu')) #Fully connected layer 1
         model.add(Dropout(0.5))
         model.add(Dense(2,activation='softmax')) #Output Layer

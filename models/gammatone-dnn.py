@@ -22,14 +22,14 @@ import sys
 import os
 
 np.random.seed(137)
-EPOCH=30 #Number of iterations to be run on the model while training
-trainfile='/home/siddharthm/scd/combined/gamma/600-gamma-labels-gender-train.htk'
+EPOCH=50 #Number of iterations to be run on the model while training
+trainfile='/home/siddharthm/scd/combined/gamma/800-gamma-labels-gender-train.htk'
 #testfile='/home/siddharthm/scd/combined/gamma-labels-gender-test.htk'
-valfile='/home/siddharthm/scd/combined/gamma/600-gamma-labels-gender-val.htk'
+valfile='/home/siddharthm/scd/combined/gamma/800-gamma-labels-gender-val.htk'
 #Some parameters for training the model
-batch=128 #Batch size to be used while training
+batch=256 #Batch size to be used while training
 direc="/home/siddharthm/scd/scores/"
-common_save='600-gamma-dnn'
+common_save='800-gamma-dnn'
 name_val=common_save+'-val'
 #name_test=common_save+'-test'
 
@@ -146,7 +146,8 @@ def metrics(y_val,classes,gender_val):
                         else:
                                 cd_incorrect_matrix[id1,id2]+=1
                 elif y_val[i,0]==1:
-                        gid=gender_val[i]-1 #1 female, 2 male.
+                        gid=int(gender_val[i]-1) #1 female, 2 male.
+                        # print "Single Gender Id: ",gid
                         if classes[i]==0:
                                 single_correct_matrix[0,gid]+=1
                         else:
@@ -159,7 +160,7 @@ def metrics(y_val,classes,gender_val):
         data_saver(single_correct_matrix)
         data_saver('Single speaker frames wrongly classified')
         data_saver(single_incorrect_matrix)
-        # ------------- ###
+        ### ------------- ###
 
 #Non-function section
 x_train,y_train,gender_train,scaler=load_data_train(trainfile)
@@ -184,7 +185,7 @@ def seq(x_train,y_train,x_val,y_val,x_test,y_test):
         # model.add(Conv2D(64,(3,5)))
         # model.add(MaxPooling2D((2,2)))
         # model.add(Flatten())
-        model.add(Dense(256,activation='relu',input_shape=(3904,)))
+        model.add(Dense(256,activation='relu',input_shape=(5184,)))
         model.add(Dense(512,activation='relu')) #Fully connected layer 1
         # model.add(Dropout(0.5))
         model.add(Dense(512,activation='relu')) #Fully connected layer 1
@@ -224,6 +225,9 @@ def seq(x_train,y_train,x_val,y_val,x_test,y_test):
 
         #predictions=model.predict(x_val,batch_size=batch)
         #print "Shape of predictions: ", predictions.shape
+        
+        data_saver(str(len(np.where(y_train[:,0]==1)[0])))
+        data_saver(str(len(np.where(y_train[:,1]==1)[0])))
         print "Training 0 class: ",len(np.where(y_train[:,0]==1)[0])
         print "Training 1 class: ",len(np.where(y_train[:,1]==1)[0])
         return classes

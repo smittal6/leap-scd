@@ -241,7 +241,7 @@ def seq(x_train,y_train,x_val,y_val,x_test,y_test):
         #Fitting region: Get to fit the model, with training data
 
         #Doing the training[fitting]
-        model.fit([x_train[:,0:-1 x_train[:,-1]]],y_train,epochs=EPOCH,batch_size=batch,validation_data=([x_val[:,0:-1] x_val[:,-1]],y_val),callbacks=[checkpointer,early_stopping,reduce_lr])
+        model.fit([x_train[:,0:-1],x_train[:,-1]],y_train,epochs=EPOCH,batch_size=batch,validation_data=([x_val[:,0:-1],x_val[:,-1]],y_val),callbacks=[checkpointer,early_stopping,reduce_lr])
         model.save_weights(direc+common_save+'-weights'+'.json') #Saving the weights from the model
         model.save(direc+common_save+'-model'+'.json')#Saving the model as is in its state
 
