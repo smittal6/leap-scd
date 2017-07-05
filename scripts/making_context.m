@@ -15,7 +15,7 @@ f=fopen('/home/siddharthm/scd/lists/rawtrainfiles.list');
 f=textscan(f,'%s');
 len=cellfun('length',f)
 type = 'GAMMA';
-context_size = 30; 
+context_size = 40; 
 
 %This into 10msec is the one sided context
 
@@ -33,7 +33,7 @@ parfor i = 1:len
               [data_extra,a,b,c,d]=readhtk([gamma_feats_addr dataset_type f{1}{i} '.htk']);
               data=data_extra';
               data=flipud(data);
-              op_path='fbank'
+              op_path='gamma'
     end
     size(data)
     f{1}{i}
@@ -77,16 +77,19 @@ parfor i = 1:len
 
         % complete the context frame with the center frame
         data_temp = [temp_l data(:,index) temp_r];
-        data_write(ssegs,:) = data_temp(:)';
+        standard_dev = std(data_temp)
+        data_write(ssegs,:) = standard_dev';
+        %data_write(ssegs,:) = data_temp(:)';
+        
         %size(label_l)
         %size(label_r)
         % create the label for the context
         label_temp = [label_l vad(index) label_r];
         %size(label_temp)
         %%%%%% write the percentage stuff here
-        p0 = length(find(label_temp)==0)/(2*context_size+1);
-        p1 = length(find(label_temp)==1)/(2*context_size+1);
-        p2 = length(find(label_temp)==2)/(2*context_size+1);
+        p0 = length(find(label_temp==0))/(2*context_size+1);
+        p1 = length(find(label_temp==1))/(2*context_size+1);
+        p2 = length(find(label_temp==2))/(2*context_size+1);
 
         if p0>0.7
             label_write(ssegs) = 0;
