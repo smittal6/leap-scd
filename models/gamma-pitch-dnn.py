@@ -7,9 +7,10 @@ from sklearn.preprocessing import StandardScaler
 from keras.preprocessing import sequence
 from keras.models import Sequential
 from keras.layers import Dense, Dropout, Embedding, LSTM, Input
-from keras.models import Sequential
+from keras.models import Sequential, Model
 from keras.layers.core import Dense, Dropout, Activation, Reshape, Permute, Flatten
 from keras.layers.wrappers import TimeDistributed
+from keras.layers.merge import concatenate
 from keras.optimizers import SGD, Adam, RMSprop
 from keras.utils import np_utils
 from keras.regularizers import l2
@@ -192,9 +193,9 @@ print "Loading validation data complete"
 # print "Loading pitch validation data complete"
 
 ## SHAPE TESTS ###
-print "Train Shape: ",fx_train.shape," ",fy_train.shape
+print "Train Shape: ",x_train.shape," ",y_train.shape
 #print "Test Shape: ",x_test.shape," ",y_test.shape
-print "Val Shape: ",fx_val.shape," ",fy_val.shape
+print "Val Shape: ",x_val.shape," ",y_val.shape
 ###
 
 ### THE MODEL and ALL ###
@@ -203,23 +204,23 @@ def seq(x_train,y_train,x_val,y_val,x_test,y_test):
 
         # Creating the first model, which takes as input the gammatone values
         model1=Sequential()
-        model1.add(Dense(512,activation='relu',input_shape=(1280,)))
+        model1.add(Dense(512,activation='relu',input_shape=(3904,)))
         model1.add(Dense(512,activation='relu')) #Fully connected layer 1
         model1.add(Dropout(0.25))
         model1.add(Dense(256,activation='relu')) #Fully connected layer 1
         model1.add(Dropout(0.1))
 
         #Creating the second model, which takes pitch variance as input
-        model2=Sequential()
-        model2.add(Input(shape=(1,)))
+        # model2=Sequential()
+        # model2.add(Input(shape=(1,)))
 
         a2 = Input(shape =(1,)) #creating the input
-        f2 = model2(a2) #making the model
+        # f2 = model2(a2) #making the model
 
-        a1 = Input(shape=(1280,)) #Just creating the input acceptance for gammatone network
+        a1 = Input(shape=(3904,)) #Just creating the input acceptance for gammatone network
         f1 = model1(a1) #make the model
 
-        y = keras.layers.concatenate([f1, f2]) #concatenating the output of two models.
+        y = concatenate([f1, a2]) #concatenating the output of two models.
         x = Dense(2, activation='softmax')(y) #Linking the model to the output
 
         model = Model(inputs=[a1, a2], outputs=x) #calling the combined model
