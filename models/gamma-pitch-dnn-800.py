@@ -178,11 +178,11 @@ def metrics(y_val,classes,gender_val):
         data_saver(single_incorrect_matrix)
         #For creating the accuracies the way I'm entring in Google sheets
         percentages=np.zeros((1,5))
-        percentages[0,0]=cd_correct_matrix[0,0]/(cd_correct_matrix[0,0]+cd_incorrect_matrix[
-        percentages[0,1]=(cd_correct_matrix[0,1]+cd_correct_matrix[1,0])/(cd_incorrect_matri
-        percentages[0,2]=cd_correct_matrix[1,1]/(cd_correct_matrix[1,1]+cd_incorrect_matrix[
-        percentages[0,3]=single_correct_matrix[0,0]/(single_correct_matrix[0,0]+single_incor
-        percentages[0,4]=single_correct_matrix[0,1]/(single_incorrect_matrix[0,1]+single_inc
+        percentages[0,0]=cd_correct_matrix[0,0]/(cd_correct_matrix[0,0]+cd_incorrect_matrix[0,0])
+        percentages[0,1]=(cd_correct_matrix[0,1]+cd_correct_matrix[1,0])/(cd_incorrect_matrix[0,1]+cd_incorrect_matrix[1,0]+cd_correct_matrix[0,1]+cd_correct_matrix[1,0])
+        percentages[0,2]=cd_correct_matrix[1,1]/(cd_correct_matrix[1,1]+cd_incorrect_matrix[1,1])
+        percentages[0,3]=single_correct_matrix[0,0]/(single_correct_matrix[0,0]+single_incorrect_matrix[0,0])
+        percentages[0,4]=single_correct_matrix[0,1]/(single_incorrect_matrix[0,1]+single_incorrect_matrix[0,1])
         data_saver(percentages)
         ### ------------- ###
 
