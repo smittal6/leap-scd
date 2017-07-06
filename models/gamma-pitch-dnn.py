@@ -205,22 +205,24 @@ def seq(x_train,y_train,x_val,y_val,x_test,y_test):
         # Creating the first model, which takes as input the gammatone values
         model1=Sequential()
         model1.add(Dense(512,activation='relu',input_shape=(3904,)))
-        model1.add(Dense(512,activation='relu')) #Fully connected layer 1
+        model1.add(Dense(512,activation='relu'))
         model1.add(Dropout(0.25))
-        model1.add(Dense(256,activation='relu')) #Fully connected layer 1
+        model1.add(Dense(256,activation='relu'))
         model1.add(Dropout(0.1))
+        model1.add(Dense(128,activation='relu'))
 
         #Creating the second model, which takes pitch variance as input
         # model2=Sequential()
         # model2.add(Input(shape=(1,)))
 
-        a2 = Input(shape =(1,)) #creating the input
+        a2 = Input(shape =(1,)) #creating the input for variance estimate
         # f2 = model2(a2) #making the model
 
         a1 = Input(shape=(3904,)) #Just creating the input acceptance for gammatone network
         f1 = model1(a1) #make the model
 
         y = concatenate([f1, a2]) #concatenating the output of two models.
+        y = Dense(64, activation='relu')(y)
         x = Dense(2, activation='softmax')(y) #Linking the model to the output
 
         model = Model(inputs=[a1, a2], outputs=x) #calling the combined model
@@ -228,7 +230,7 @@ def seq(x_train,y_train,x_val,y_val,x_test,y_test):
         model.summary()
         ### SAVE MODEL STUFF ###
         data_saver("##### -------- #####")
-        data_saver(str(model.to_json()))
+        # data_saver(str(model.to_json()))
 
         ### Some crucial calls ###
         sgd=SGD(lr=1)
@@ -247,9 +249,9 @@ def seq(x_train,y_train,x_val,y_val,x_test,y_test):
         model.save(direc+common_save+'-model'+'.json')#Saving the model as is in its state
 
         ### SAVING THE VALIDATION DATA ###
-        scores=model.predict(x_val,batch_size=batch)
+        scores=model.predict([x_val[:,0:-1],x_val[:,-1]],batch_size=batch)
         sio.savemat(direc+name_val+'.mat',{'scores':scores,'ytest':y_val}) #These are the validation scores.
-        classes=model.predict_classes(x_val,batch_size=batch)
+        classes=model.predict_classes([x_val[:,0:-1],x_val[:,-1]],batch_size=batch)
         ### ------------- ###
 
         ### SAVING THE TESTING DATA ###
