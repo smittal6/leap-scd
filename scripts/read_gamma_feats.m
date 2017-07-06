@@ -1,11 +1,11 @@
 
 % obtaining mel spectrum
 
-poolsize = 4;
+poolsize = 8;
 parpool(poolsize);
 
-path = '/home/user/work/scd/wav/test/'; %Path of wav files
-savedir = '/home/user/work/scd/feats/gamma/test/'; %The save directory
+path = '/home/siddharthm/scd/wav/test/'; %Path of wav files
+savedir = '/home/siddharthm/scd/feats/gamma/test/'; %The save directory
 filename = dir([path '*.wav']);
 len = length(filename);
 Fs_proc = 16e3;

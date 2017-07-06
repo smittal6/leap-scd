@@ -9,8 +9,8 @@ import htkmfc as htk
 # If female then mark her as 0 and if male then mark as 1
 # Now for any kind of combination, we take both the ids and concatenate them, and store as int
 
-percentage_to_keep=0.1
-keep_true=1
+percentage_to_keep=0.05
+keep_true=0.90
 
 def return_vec(x,id1,id2):
         vector=np.zeros((len(x),1))
@@ -71,6 +71,7 @@ def data_creator(num,addr,file_reader,filename):
                         id1=(1,2)[(file_reader[i][0]=='M')==True]
                         temp_index=file_reader[i].index("-")
                         id2=(1,2)[(file_reader[i][temp_index+1]=='M')==True]
+                        read_data[:,-1]=read_data[:,-1]-1 #our original labels have 2 as speaker change and 1 as no speaker change
                         gender_label=return_vec(read_data[:,-1],id1,id2)
                         read_data=np.hstack((read_data,gender_label))
                         read_data=filter_data(read_data)
@@ -102,15 +103,15 @@ def data_creator(num,addr,file_reader,filename):
         f.close()
 
 # First sys input is whether test/, train/ or val/ and second input is trainfile.list or ...., third is train, test or val
-addr='/home/siddharthm/scd/context/200/fbank/'+str(sys.argv[1])#address of the HTK files stored somewhere
-cwd='/home/siddharthm/scd/combined/fbank' #The directory where we will change the address of 
+addr='/home/siddharthm/scd/context/600/fbank/'+str(sys.argv[1])#address of the HTK files stored somewhere
+cwd='/home/siddharthm/scd/combined/fbank/' #The directory where we will change the address of 
 # kurt_addr='/home/siddharthm/scd/feats/kurt/'+str(sys.argv[1])
 # sfm_addr='/home/siddharthm/scd/feats/sfm/'+str(sys.argv[1])
 # label_addr='/home/siddharthm/scd/vad/'+str(sys.argv[1])
-num=20*64+1+1 #The length of the feature vector, to be read and stored in the htk format[Right now,20*40 Fbank +1 Label+1 gender]
+num=61*64+1+1 #The length of the feature vector, to be read and stored in the htk format[Right now,20*40 Fbank +1 Label+1 gender]
 file_read='/home/siddharthm/scd/lists/'+str(sys.argv[2]) #The raw filenames, in the form of list
-filename='200-fbank-labels-gender-'+str(sys.argv[3]) #The name of the file where stuff is going to be stored
-save_extra='200-fbank-extra-'+str(sys.argv[3])+'.txt' #For saving the count of lables
+filename='600-fbank-labels-gender-'+str(sys.argv[3]) #The name of the file where stuff is going to be stored
+save_extra='600-fbank-extra-'+str(sys.argv[3])+'.txt' #For saving the count of lables
 file_reader=file_opener(file_read) #Calling the function to read the list of files
 # file_reader=['FAJW0_I1263-FCYL0_X349-9346','FAJW0_I1263-FGCS0_X226-13892']
 data_creator(num,addr,file_reader,filename) #Finally call the data creator

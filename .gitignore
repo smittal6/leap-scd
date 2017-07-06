@@ -9,6 +9,10 @@ vad/
 combined/
 context/
 scores/
+lists/*.list
 lists/trainfiles/
+lists/train/
 lists/testfiles/
+lists/test/
 lists/valfiles/
+lists/val/

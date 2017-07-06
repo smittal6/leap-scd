@@ -1,21 +1,21 @@
 
 
 clear all; clc;
-poolsize = 8;
+poolsize = 12;
 parpool(poolsize);
 
 % ----- update the path to respective directories
 dataset_type = 'test/';
 label_addr = '/home/siddharthm/scd/vad/10/';
 gamma_feats_addr = '/home/siddharthm/scd/feats/gamma/';
-context_addr = '/home/siddharthm/scd/context/600/';
+context_addr = '/home/siddharthm/scd/context/800/';
 
 % ----- list of files
 f=fopen('/home/siddharthm/scd/lists/rawtestfiles.list');
 f=textscan(f,'%s');
 len=cellfun('length',f)
 type = 'GAMMA';
-context_size = 30; 
+context_size = 40; 
 
 %This into 10msec is the one sided context
 

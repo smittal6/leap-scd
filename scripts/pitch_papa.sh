@@ -3,4 +3,5 @@
 
 #find /home/user/pra/pit/ -type f -exec sed -i "s|--undefined--|0|g" 
 
-find /home/user/pra/pit/ -type f -name "*.Pitch" -print0 | xargs -0 sed -i "s/--undefined--/0/g"
+#find /home/siddharthm/scd/feats/pitch/train/ -type f -name "*.Pitch" -print0 | xargs -0 sed -i "s/--undefined--/0/g"
+find /home/siddharthm/scd/feats/pitch/val/ -type f -name "*.Pitch" -print0 | xargs -0 sed -i "s/--undefined--/0/g"

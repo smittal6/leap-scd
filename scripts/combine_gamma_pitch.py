@@ -9,8 +9,8 @@ import htkmfc as htk
 # If female then mark her as 0 and if male then mark as 1
 # Now for any kind of combination, we take both the ids and concatenate them, and store as int
 
-percentage_to_keep=0.06
-keep_true=0.60
+percentage_to_keep=0.03
+keep_true=0.50
 
 def return_vec(x,id1,id2):
         vector=np.zeros((len(x),1))
@@ -109,16 +109,16 @@ def data_creator(num,addr,file_reader,filename):
         f.close()
 
 # First sys input is whether test/, train/ or val/ and second input is trainfile.list or ...., third is train, test or val
-addr='/home/siddharthm/scd/context/600/gamma/'+str(sys.argv[1])#address of the context HTK files
-paddr='/home/siddharthm/scd/context/600/pitch/'+str(sys.argv[1])#address of the context HTK file
+addr='/home/siddharthm/scd/context/800/gamma/'+str(sys.argv[1])#address of the context HTK files
+paddr='/home/siddharthm/scd/context/800/pitch/'+str(sys.argv[1])#address of the context HTK file
 cwd='/home/siddharthm/scd/combined/gamma_pitch/' #The directory where we will change the address of 
 # kurt_addr='/home/siddharthm/scd/feats/kurt/'+str(sys.argv[1])
 # sfm_addr='/home/siddharthm/scd/feats/sfm/'+str(sys.argv[1])
 # label_addr='/home/siddharthm/scd/vad/'+str(sys.argv[1])
-num=61*64+1+1+1 #The length of the feature vector, to be read and stored in the htk format[Right now,20*64 Gammatone+1 Label+1 gender]
+num=81*64+1+1+1 #The length of the feature vector, to be read and stored in the htk format[Right now,20*64 Gammatone+1 Label+1 gender]
 file_read='/home/siddharthm/scd/lists/'+str(sys.argv[2]) #The raw filenames, in the form of list
-filename='600-gamma-pitch-labels-gender-'+str(sys.argv[3]) #The name of the file where stuff is going to be stored
-save_extra='600-gamma-pitch-extra-'+str(sys.argv[3])+'.txt' #For saving the count of lables
+filename='800-gamma-pitch-labels-gender-'+str(sys.argv[3]) #The name of the file where stuff is going to be stored
+save_extra='800-gamma-pitch-extra-'+str(sys.argv[3])+'.txt' #For saving the count of lables
 file_reader=file_opener(file_read) #Calling the function to read the list of files
 # file_reader=['FAJW0_I1263-FCYL0_X349-9346','FAJW0_I1263-FGCS0_X226-13892']
 data_creator(num,addr,file_reader,filename) #Finally call the data creator
