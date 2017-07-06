@@ -34,7 +34,7 @@ testfile='/home/siddharthm/scd/combined/gamma_pitch/800-gamma-pitch-labels-gende
 valfile='/home/siddharthm/scd/combined/gamma_pitch/800-gamma-pitch-labels-gender-val.htk'
 
 #Some parameters for training the model
-batch=128 #Batch size to be used while training
+batch=256 #Batch size to be used while training
 direc="/home/siddharthm/scd/scores/"
 common_save='800-gamma-pitch'
 name_val=common_save+'-val'
@@ -43,7 +43,7 @@ name_val=common_save+'-val'
 def filter_data_train(x):
         stack1=x[x[:,-2]==1]
         np.random.shuffle(stack1)
-        stack1=stack1[0:int(0.50*x.shape[0])]
+        stack1=stack1[0:int(0.25*x.shape[0])]
         stack2=x[x[:,-2]==0]
         mat=np.vstack((stack1,stack2))
         np.random.shuffle(mat)
@@ -51,7 +51,7 @@ def filter_data_train(x):
 def filter_data_val(x):
         stack1=x[x[:,-2]==1]
         np.random.shuffle(stack1)
-        stack1=stack1[0:int(0.50*x.shape[0])]
+        stack1=stack1[0:int(0.25*x.shape[0])]
         stack2=x[x[:,-2]==0]
         mat=np.vstack((stack1,stack2))
         np.random.shuffle(mat)
@@ -182,7 +182,7 @@ def metrics(y_val,classes,gender_val):
         percentages[0,1]=(cd_correct_matrix[0,1]+cd_correct_matrix[1,0])/(cd_incorrect_matrix[0,1]+cd_incorrect_matrix[1,0]+cd_correct_matrix[0,1]+cd_correct_matrix[1,0])
         percentages[0,2]=cd_correct_matrix[1,1]/(cd_correct_matrix[1,1]+cd_incorrect_matrix[1,1])
         percentages[0,3]=single_correct_matrix[0,0]/(single_correct_matrix[0,0]+single_incorrect_matrix[0,0])
-        percentages[0,4]=single_correct_matrix[0,1]/(single_incorrect_matrix[0,1]+single_incorrect_matrix[0,1])
+        percentages[0,4]=single_correct_matrix[0,1]/(single_incorrect_matrix[0,1]+single_correct_matrix[0,1])
         data_saver(percentages)
         ### ------------- ###
 
@@ -216,12 +216,12 @@ def seq(x_train,y_train,x_val,y_val,x_test,y_test):
         a1 = Input(shape=(5184,)) #Just creating the input acceptance for gammatone network
         z=Dense(1024,activation='relu')(a1)
         z=Dense(1024,activation='relu')(z)
-        z=Dropout(0.25)(z)
+        z=Dropout(0.1)(z)
         z=Dense(512,activation='relu')(z)
-        z=Dropout(0.25)(z)
+        z=Dropout(0.1)(z)
         z=Dense(256,activation='relu')(z)
-        z=Dense(128,activation='relu')(z)
-        z=Dense(64,activation='relu')(z)
+        # z=Dense(128,activation='relu')(z)
+        # z=Dense(64,activation='relu')(z)
         #Creating the second model, which takes pitch variance as input
         # model2=Sequential()
         # model2.add(Input(shape=(1,)))

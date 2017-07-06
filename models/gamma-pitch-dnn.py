@@ -181,7 +181,7 @@ def metrics(y_val,classes,gender_val):
         percentages[0,1]=(cd_correct_matrix[0,1]+cd_correct_matrix[1,0])/(cd_incorrect_matrix[0,1]+cd_incorrect_matrix[1,0]+cd_correct_matrix[0,1]+cd_correct_matrix[1,0])#M-F/F-M
         percentages[0,2]=cd_correct_matrix[1,1]/(cd_correct_matrix[1,1]+cd_incorrect_matrix[1,1]) #male-male
         percentages[0,3]=single_correct_matrix[0,0]/(single_correct_matrix[0,0]+single_incorrect_matrix[0,0]) #female speaker
-        percentages[0,4]=single_correct_matrix[0,1]/(single_incorrect_matrix[0,1]+single_incorrect_matrix[0,1]) #male single speaker
+        percentages[0,4]=single_correct_matrix[0,1]/(single_incorrect_matrix[0,1]+single_correct_matrix[0,1]) #male single speaker
         data_saver(percentages)
         ### ------------- ###
 
@@ -215,11 +215,11 @@ def seq(x_train,y_train,x_val,y_val,x_test,y_test):
         a1 = Input(shape=(3904,)) #Just creating the input acceptance for gammatone network
         z=Dense(512,activation='relu')(a1)
         z=Dense(512,activation='relu')(z)
-        z=Dropout(0.25)(z)
+        z=Dropout(0.1)(z)
         z=Dense(256,activation='relu')(z)
         z=Dropout(0.1)(z)
         z=Dense(128,activation='relu')(z)
-        z=Dense(64,activation='relu')(z)
+        # z=Dense(64,activation='relu')(z)
         #Creating the second model, which takes pitch variance as input
         # model2=Sequential()
         # model2.add(Input(shape=(1,)))
