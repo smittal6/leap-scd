@@ -12,7 +12,7 @@ from keras.layers.core import Dense, Dropout, Activation, Reshape, Permute, Flat
 from keras.layers.wrappers import TimeDistributed
 from keras.layers.merge import concatenate
 from keras.optimizers import SGD, Adam, RMSprop
-from keras.utils import np_utils
+from keras.utils import np_utils,plot_model
 from keras.regularizers import l2
 from keras.callbacks import ModelCheckpoint,EarlyStopping,ReduceLROnPlateau
 from keras.layers.convolutional import Conv2D
@@ -228,7 +228,7 @@ def seq(x_train,y_train,x_val,y_val,x_test,y_test):
         x = Dense(2, activation='softmax')(y) #Linking the model to the output
 
         model = Model(inputs=[a1, a2], outputs=x) #calling the combined model
-
+        plot_model(model,to_file='gp-800.jpg')
         model.summary()
         ### SAVE MODEL STUFF ###
         data_saver("##### -------- #####")
