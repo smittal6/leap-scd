@@ -5,22 +5,22 @@ poolsize = 8;
 parpool(poolsize);
 
 % ----- update the path to respective directories
-dataset_type = 'train/'
+dataset_type = 'test/';
 label_addr = '/home/siddharthm/scd/vad/10/';
-gamma_feats_addr = '/home/siddharthm/scd/feats/fbank/';
+gamma_feats_addr = '/home/siddharthm/scd/feats/gamma/';
 context_addr = '/home/siddharthm/scd/context/600/';
 
 % ----- list of files
-f=fopen('/home/siddharthm/scd/lists/rawtrainfiles.list');
+f=fopen('/home/siddharthm/scd/lists/rawtestfiles.list');
 f=textscan(f,'%s');
 len=cellfun('length',f)
 type = 'GAMMA';
-context_size = 40; 
+context_size = 30; 
 
 %This into 10msec is the one sided context
 
 parfor i = 1:len
-%for i = 1:len
+%for i = 1:3%len
     [i len]
 
     % read the label file
@@ -33,7 +33,7 @@ parfor i = 1:len
               [data_extra,a,b,c,d]=readhtk([gamma_feats_addr dataset_type f{1}{i} '.htk']);
               data=data_extra';
               data=flipud(data);
-              op_path='gamma'
+              op_path='gamma';
     end
     size(data)
     f{1}{i}
@@ -50,7 +50,7 @@ parfor i = 1:len
             temp_l = [];
             temp_r = data(:,index+1:index+context_size);
             
-            label_l = []
+            label_l = [];
             label_r = vad(index+1:index+context_size);
         elseif (nframes-index+1)<(context_size+1)
             temp_l = data(:,index-context_size:index-1);
@@ -77,9 +77,9 @@ parfor i = 1:len
 
         % complete the context frame with the center frame
         data_temp = [temp_l data(:,index) temp_r];
-        standard_dev = std(data_temp)
-        data_write(ssegs,:) = standard_dev';
-        %data_write(ssegs,:) = data_temp(:)';
+        %standard_dev = std(data_temp)
+        %data_write(ssegs,:) = standard_dev';
+        data_write(ssegs,:) = data_temp(:)';
         
         %size(label_l)
         %size(label_r)
@@ -107,3 +107,4 @@ parfor i = 1:len
     %size(label_write);
     writehtk([context_addr op_path '/'  dataset_type f{1}{i} '.htk'],[data_write label_write],0.11,9); 
 end
+delete(gcp('nocreate'))
