@@ -251,7 +251,7 @@ def seq(x_train,y_train,x_val,y_val,x_test,y_test):
         ### SAVING THE VALIDATION DATA ###
         scores=model.predict([x_val[:,0:-1],x_val[:,-1]],batch_size=batch)
         sio.savemat(direc+name_val+'.mat',{'scores':scores,'ytest':y_val}) #These are the validation scores.
-        classes=model.predict_classes([x_val[:,0:-1],x_val[:,-1]],batch_size=batch)
+        classes=scores.argmax(axis=-1)
         ### ------------- ###
 
         ### SAVING THE TESTING DATA ###
