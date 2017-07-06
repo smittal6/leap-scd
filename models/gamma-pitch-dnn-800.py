@@ -30,7 +30,7 @@ EPOCH=30 #Number of iterations to be run on the model while training
 trainfile='/home/siddharthm/scd/combined/gamma_pitch/800-gamma-pitch-labels-gender-train.htk'
 ### TESTFILE SECTION ###
 testfile='/home/siddharthm/scd/combined/gamma_pitch/800-gamma-pitch-labels-gender-test.htk'
-### VALIDATION FILE SECTION ###
+### VALIDATION FILE SECTION  ##
 valfile='/home/siddharthm/scd/combined/gamma_pitch/800-gamma-pitch-labels-gender-val.htk'
 
 #Some parameters for training the model
@@ -176,6 +176,14 @@ def metrics(y_val,classes,gender_val):
         data_saver(single_correct_matrix)
         data_saver('Single speaker frames wrongly classified')
         data_saver(single_incorrect_matrix)
+        #For creating the accuracies the way I'm entring in Google sheets
+        percentages=np.zeros((1,5))
+        percentages[0,0]=cd_correct_matrix[0,0]/(cd_correct_matrix[0,0]+cd_incorrect_matrix[
+        percentages[0,1]=(cd_correct_matrix[0,1]+cd_correct_matrix[1,0])/(cd_incorrect_matri
+        percentages[0,2]=cd_correct_matrix[1,1]/(cd_correct_matrix[1,1]+cd_incorrect_matrix[
+        percentages[0,3]=single_correct_matrix[0,0]/(single_correct_matrix[0,0]+single_incor
+        percentages[0,4]=single_correct_matrix[0,1]/(single_incorrect_matrix[0,1]+single_inc
+        data_saver(percentages)
         ### ------------- ###
 
 #Load training data
@@ -205,26 +213,26 @@ def seq(x_train,y_train,x_val,y_val,x_test,y_test):
         #Defining the structure of the neural network
 
         # Creating the first model, which takes as input the gammatone values
-        model1=Sequential()
-        model1.add(Dense(1024,activation='relu',input_shape=(5184,)))
-        model1.add(Dense(1024,activation='relu'))
-        model1.add(Dropout(0.25))
-        model1.add(Dense(512,activation='relu'))
-        model1.add(Dropout(0.25))
-        model1.add(Dense(256,activation='relu'))
-        model1.add(Dense(128,activation='relu'))
+        a1 = Input(shape=(5184,)) #Just creating the input acceptance for gammatone network
+        z=Dense(1024,activation='relu')(a1)
+        z=Dense(1024,activation='relu')(z)
+        z=Dropout(0.25)(z)
+        z=Dense(512,activation='relu')(z)
+        z=Dropout(0.25)(z)
+        z=Dense(256,activation='relu')(z)
+        z=Dense(128,activation='relu')(z)
+        z=Dense(64,activation='relu')(z)
         #Creating the second model, which takes pitch variance as input
         # model2=Sequential()
         # model2.add(Input(shape=(1,)))
 
+        model1=Model(inputs=a1,outputs=z)
+        # f1 = model1(a1) #make the model
+
         a2 = Input(shape =(1,)) #creating the input
         # f2 = model2(a2) #making the model
 
-        a1 = Input(shape=(5184,)) #Just creating the input acceptance for gammatone network
-        f1 = model1(a1) #make the model
-
-        y = concatenate([f1, a2]) #concatenating the output of two models.
-        y = Dense(64,activation='relu')(y)
+        y = concatenate([z, a2]) #concatenating the output of two models.
         x = Dense(2, activation='softmax')(y) #Linking the model to the output
 
         model = Model(inputs=[a1, a2], outputs=x) #calling the combined model

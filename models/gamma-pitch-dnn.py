@@ -24,7 +24,7 @@ import sys
 import os
 
 np.random.seed(1337)
-EPOCH=1 #Number of iterations to be run on the model while training
+EPOCH=30 #Number of iterations to be run on the model while training
 
 ### TRAINFILE SECTION ###
 trainfile='/home/siddharthm/scd/combined/gamma_pitch/600-gamma-pitch-labels-gender-train.htk'
@@ -212,7 +212,8 @@ def seq(x_train,y_train,x_val,y_val,x_test,y_test):
         #Defining the structure of the neural network
 
         # Creating the first model, which takes as input the gammatone values
-        z=Dense(512,activation='relu')
+        a1 = Input(shape=(3904,)) #Just creating the input acceptance for gammatone network
+        z=Dense(512,activation='relu')(a1)
         z=Dense(512,activation='relu')(z)
         z=Dropout(0.25)(z)
         z=Dense(256,activation='relu')(z)
@@ -223,14 +224,13 @@ def seq(x_train,y_train,x_val,y_val,x_test,y_test):
         # model2=Sequential()
         # model2.add(Input(shape=(1,)))
 
-        a1 = Input(shape=(3904,)) #Just creating the input acceptance for gammatone network
         model1=Model(inputs=a1,outputs=z)
-        f1 = model1(a1) #make the model
+         #make the model
 
         a2 = Input(shape =(1,)) #creating the input for variance estimate
         # f2 = model2(a2) #making the model
 
-        y = concatenate([f1, a2]) #concatenating the output of two models.
+        y = concatenate([z, a2]) #concatenating the output of two models.
         # y = Dense(64, activation='relu')(y)
         x = Dense(2, activation='softmax')(y) #Linking the model to the output
 
