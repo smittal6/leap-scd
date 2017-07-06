@@ -236,7 +236,7 @@ def seq(x_train,y_train,x_val,y_val,x_test,y_test):
         x = Dense(2, activation='softmax')(y) #Linking the model to the output
 
         model = Model(inputs=[a1, a2], outputs=x) #calling the combined model
-        plot_model(model,to_file='gp-800.jpg')
+        plot_model(model,to_file='gp-800.png')
         model.summary()
         ### SAVE MODEL STUFF ###
         data_saver("##### -------- #####")
