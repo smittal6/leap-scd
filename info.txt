@@ -60,3 +60,6 @@ Have the feats for MFCC-only, Fbank.
 Compute the context again.. :P
 Generating the context for only MFCC's.
 
+-------
+FEATS:
+Pitch, Gamma, FBank are complete with respect to all 3 sets.
