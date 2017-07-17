@@ -1,7 +1,7 @@
 # Speaker Change Detection
 
 Repository for the project done at [LEAP Lab](http://leap.ee.iisc.ac.in/), Indian Institute of Science, under the guidance of [Neeraj Sharma](http://ece.iisc.ernet.in/~neeraj_sharma/) and [Prof. Sriram Ganapathy](http://www.leap.ee.iisc.ac.in/sriram/). 
-The aim was to develop a model to detect speaker change in a given wave file.
+The aim was to develop a real time and speaker independent model to detect speaker change in a given wave file.
 
 ## Dataset
 TIMIT Dataset was used. Three disjoint set of speakers was created, and only SX and SI sentences for each speaker were taken into consideration while creating the files.
