@@ -42,7 +42,7 @@ name_val=common_save+'-val'
 
 def filter_data_train(x):
         stack1=x[x[:,-2]==0]
-        stack1=stack1[0:int(0.40*x.shape[0])]
+        stack1=stack1[0:int(0.43*x.shape[0])]
         stack2=x[x[:,-2]==1]
         mat=np.vstack((stack1,stack2))
         np.random.shuffle(mat)
@@ -256,7 +256,7 @@ def seq(x_train,y_train,x_val,y_val,x_test,y_test):
         #Doing the training[fitting]
         model.fit([x_train[:,0:-1],x_train[:,-1]],y_train,epochs=EPOCH,batch_size=batch,validation_data=([x_val[:,0:-1],x_val[:,-1]],y_val),callbacks=[checkpointer,early_stopping,reduce_lr])
         model.save_weights(direc+common_save+'-weights'+'.json') #Saving the weights from the model
-        model.save(direc+common_save+'-model'+'.json')#Saving the model as is in its state
+        model.save(direc+common_save+'-model'+'.h5')#Saving the model as is in its state
 
         ### SAVING THE VALIDATION DATA ###
         scores=model.predict([x_val[:,0:-1],x_val[:,-1]],batch_size=batch)
