@@ -56,6 +56,6 @@ model=load_model('600-gamma-pitch-model.h5')
 for i in range(len(List)):
         print "The file is: ",List[i] #printing which file we are considering.
         x_val,pitch,y_truth=Data_Getter(List[i]) #Gets the raw input, and the ground truth file
-        Scores=model.predict(Context_val,batch_size=256)
-        print(Scores.shape)
-        sio.savemat('/home/neerajs/work/codes/results/discard_meeting/'+List[i]+'.mat',{'Scores':Scores,'Y_train':Y_train})
+        scores=model.predict([x_val,pitch],batch_size=256)
+        classes=scores.argmax(axis=-1)
+        sio.savemat('/home/siddharthm/scd/filepred/train/'+List[i]+'.mat',{'truth':y_truth,'predict':classes})
